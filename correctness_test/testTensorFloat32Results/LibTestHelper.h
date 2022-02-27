@@ -103,8 +103,8 @@ void RunTestForExponent() {
   for (int i = 0; i < 3; i++) {
     if (wrongCounts[i] == 0) printf("\033[0;32mo\033[0m");
     else printf("\033[0;31mx\033[0m");
-    if (i < 2) printf("     ");
-    else printf("      ");
+    if (i < 2) printf("    ");
+    else printf("     ");
   }
 }
 
