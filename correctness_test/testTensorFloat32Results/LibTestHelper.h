@@ -71,30 +71,30 @@ void RunTestForExponent() {
         wrongCounts[2]++;
       }
       // RNA
-      double res = __ELEM_FP32_RNA__(fx.f);
-      double oracleResult = RoundDoubleToF8N(orc, 32, RNA);
-      double roundedRes = RoundDoubleToF8N(res, 32, RNA);
+      res = __ELEM_FP32_RNA__(fx.f);
+      oracleResult = RoundDoubleToF8N(orc, 32, RNA);
+      roundedRes = RoundDoubleToF8N(res, 32, RNA);
       if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
       if (oracleResult != roundedRes) wrongCounts[2]++;
 
       // RNZ
-      double res = __ELEM_FP32_RNZ__(fx.f);
-      double oracleResult = RoundDoubleToF8N(orc, 32, RNZ);
-      double roundedRes = RoundDoubleToF8N(res, 32, RNZ);
+      res = __ELEM_FP32_RNZ__(fx.f);
+      oracleResult = RoundDoubleToF8N(orc, 32, RNZ);
+      roundedRes = RoundDoubleToF8N(res, 32, RNZ);
       if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
       if (oracleResult != roundedRes) wrongCounts[2]++;
 
       // RNP
-      double res = __ELEM_FP32_RNP__(fx.f);
-      double oracleResult = RoundDoubleToF8N(orc, 32, RNP);
-      double roundedRes = RoundDoubleToF8N(res, 32, RNP);
+      res = __ELEM_FP32_RNP__(fx.f);
+      oracleResult = RoundDoubleToF8N(orc, 32, RNP);
+      roundedRes = RoundDoubleToF8N(res, 32, RNP);
       if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
       if (oracleResult != roundedRes) wrongCounts[2]++;
 
       // RNN
-      double res = __ELEM_FP32_RNN__(fx.f);
-      double oracleResult = RoundDoubleToF8N(orc, 32, RNN);
-      double roundedRes = RoundDoubleToF8N(res, 32, RNN);
+      res = __ELEM_FP32_RNN__(fx.f);
+      oracleResult = RoundDoubleToF8N(orc, 32, RNN);
+      roundedRes = RoundDoubleToF8N(res, 32, RNN);
       if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
       if (oracleResult != roundedRes) wrongCounts[2]++;
     #endif
