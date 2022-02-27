@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -n  "| sinpi(x) |  "
+echo -n  "| sinpi(x) | "
 ./proglibm/Sinpi
 echo -n  " | "
 echo -n  " N/A  N/A  N/A  "
