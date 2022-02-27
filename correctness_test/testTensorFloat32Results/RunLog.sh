@@ -2,12 +2,12 @@
 
 echo -n  "| ln(x)    |  "
 ./proglibm/Log
-echo -n  " | "
+echo -n  " |  "
 ./glibc_double/Log
-echo -n  " | "
+echo -n  " |  "
 ./intel_double/Log
-echo -n  " | "
+echo -n  " |  "
 ./crlibm/Log
-echo -n  " | "
+echo -n  " |  "
 echo -ne " \033[0;32mo\033[0m    \033[0;32mo\033[0m    \033[0;32mo\033[0m     "
-echo     " | "
+echo     " |  "

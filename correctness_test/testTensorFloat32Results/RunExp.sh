@@ -2,12 +2,12 @@
 
 echo -n  "| exp(x)   |  "
 ./proglibm/Exp
-echo -n  " | "
+echo -n  " |  "
 ./glibc_double/Exp
-echo -n  " | "
+echo -n  " |  "
 ./intel_double/Exp
-echo -n  " | "
+echo -n  " |  "
 ./crlibm/Exp
-echo -n  " | "
+echo -n  " |  "
 echo -ne " \033[0;32mo\033[0m    \033[0;32mo\033[0m    \033[0;32mo\033[0m     "
-echo     " | "
+echo     " |  "
