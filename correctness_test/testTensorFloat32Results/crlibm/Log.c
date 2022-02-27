@@ -1,3 +1,4 @@
+#include "crlibm.h"
 #define __GEN_ELEM__ rlibm34_log
 #define	__ELEM__ log_rn
 #include "LibTestHelper.h"

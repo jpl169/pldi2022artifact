@@ -1,3 +1,4 @@
+#include "crlibm.h"
 #define __GEN_ELEM__ rlibm34_cospi
 #define	__ELEM__ cospi_rn
 #include "LibTestHelper.h"

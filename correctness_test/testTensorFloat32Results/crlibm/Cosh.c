@@ -1,3 +1,4 @@
+#include "crlibm.h"
 #define __GEN_ELEM__ rlibm34_cosh
 #define	__ELEM__ cosh_rn
 #include "LibTestHelper.h"
