@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -n  "| log10(x)  |  "
+echo -n  "| log10(x) |  "
 ./proglibm/Log10
 echo -n  " | "
 ./glibc_double/Log10

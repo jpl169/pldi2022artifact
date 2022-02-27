@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -n  "| sinh(x)   |  "
+echo -n  "| sinh(x)  |  "
 ./proglibm/Sinh
 echo -n  " | "
 ./glibc_double/Sinh
