@@ -7,7 +7,7 @@ echo -n " | "
 echo -n " | "
 ./intel_double/Exp2
 echo -n " | "
-./crlibm/Exp2
+echo -n  " N/A  N/A  N/A  "
 echo -n " | "
 echo -e " \033[0;32mo\033[0m    \033[0;32mo\033[0m    \033[0;32mo\033[0m     "
 echo -n " | "

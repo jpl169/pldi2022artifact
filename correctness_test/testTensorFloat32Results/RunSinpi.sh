@@ -3,7 +3,6 @@
 echo -n  "| sinpi(x) |  "
 ./proglibm/Sinpi
 echo -n  " | "
-./glibc_double/Sinpi
 echo -n  " N/A  N/A  N/A  "
 ./intel_double/Sinpi
 echo -n  " | "
