@@ -1,6 +1,6 @@
 #include "crlibm.h"
 #define __GEN_ELEM__ rlibm34_log10
-#define	__ELEM_TF32__ log10rn
+#define	__ELEM_TF32__ log10_rn
 #define	__ELEM_BF16__ log10_rn
 #define __ELEM_FP32_SAME__ 0
 #define __ELEM_FP32_RNE__ log10_rn
