@@ -1,13 +1,13 @@
 #!/bin/bash
 
-echo -n "| sinh(x)  |  "
-echo -ne "\033[0;32mo\033[0m   \033[0;32mo\033[0m   \033[0;32mo\033[0m   \033[0;32mo\033[0m   \033[0;32mo\033[0m"
-echo -n "  |  "
+echo -n  "| sinh(x)   |  "
+./proglibm/Sinh
+echo -n  " | "
 ./glibc_double/Sinh
-echo -n "  |  "
+echo -n  " | "
 ./intel_double/Sinh
-echo -n "  |  "
+echo -n  " | "
 ./crlibm/Sinh
-echo -n "  |  "
-./rlibm32/Sinh
-echo    "  |"
+echo -n  " | "
+echo -ne " \033[0;32mo\033[0m    \033[0;32mo\033[0m    \033[0;32mo\033[0m     "
+echo     " | "

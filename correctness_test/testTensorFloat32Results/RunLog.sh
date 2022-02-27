@@ -1,13 +1,13 @@
 #!/bin/bash
 
-echo -n "| ln(x)    |  "
-echo -ne "\033[0;32mo\033[0m   \033[0;32mo\033[0m   \033[0;32mo\033[0m   \033[0;32mo\033[0m   \033[0;32mo\033[0m"
-echo -n "  |  "
+echo -n  "| ln(x)     |  "
+./proglibm/Log
+echo -n  " | "
 ./glibc_double/Log
-echo -n "  |  "
+echo -n  " | "
 ./intel_double/Log
-echo -n "  |  "
+echo -n  " | "
 ./crlibm/Log
-echo -n "  |  "
-./rlibm32/Log
-echo    "  |"
+echo -n  " | "
+echo -ne " \033[0;32mo\033[0m    \033[0;32mo\033[0m    \033[0;32mo\033[0m     "
+echo     " | "
