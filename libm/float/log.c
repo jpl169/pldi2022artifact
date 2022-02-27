@@ -1,6 +1,6 @@
 #include <math.h>
-#include "float_lib.h"
-#include "log.h"
+#include "float/float_lib.h"
+#include "float/log.h"
 
 #define LN2HIGH 0.69314718055994528622676398299518041312694549560546875
 

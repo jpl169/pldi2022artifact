@@ -1,5 +1,5 @@
-#include "float_lib.h"
-#include "sinpicospi.h"
+#include "float/float_lib.h"
+#include "float/sinpicospi.h"
 
 float rlibm_fast_cospi(float x) {
   float_x fX;

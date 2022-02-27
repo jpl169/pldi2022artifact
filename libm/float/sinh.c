@@ -1,5 +1,5 @@
-#include "float_lib.h"
-#include "sinhcosh.h"
+#include "float/float_lib.h"
+#include "float/sinhcosh.h"
 
 #define CONST64BYLN2 92.332482616893656768297660164535045623779296875
 #define LN2BY64 0.01083042469624914509729318723429969395510852336883544921875

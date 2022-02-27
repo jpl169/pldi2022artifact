@@ -1,33 +1,30 @@
-all: floatlibm floatrnolibm floatproglibm
+all: floatlibm floatproglibm
 
 floatlibm:floatlibm.a
-
-floatrnolibm: floatrnolibm.a
-
 floatproglibm: floatproglibm.a
 
 CC = gcc
 
-floatfiles = exp2 exp2_adapt log2 exp log10 log cosh cosh_v2 cosh_v3 cosh_v4 sinh sinpi cospi exp10 exp10_v2
-floatrnofiles = log2 log exp10 exp10_adapt exp2 exp2_adapt exp exp_adapt log10 cosh sinh cospi sinpi log-piecewise log2-piecewise exp-piecewise exp-piecewise-adapt exp2-piecewise exp10-piecewise log10-piecewise log10-piecewise_v2 log2-libc
-floatprogfiles = exp2_bf16 exp2_rno exp2_tf32 log2_rno log2_tf32 log2_bf16 log10_rno log10_tf32 log10_bf16 log_rno log_tf32 log_bf16 exp_bf16 exp_rno exp_tf32 exp10_bf16 exp10_rno exp10_tf32 cosh_bf16 cosh_rno cosh_tf32 sinh_bf16 sinh_rno sinh_tf32 cospi_bf16 cospi_rno cospi_tf32 sinpi_bf16 sinpi_rno sinpi_tf32
+floatfiles = log log2 log10 exp exp2 exp10 sinh cosh sinpi cospi
+floatprogfiles = log_rno log_tf32 log_bf16 \
+		log2_rno log2_tf32 log2_bf16 \
+		log10_rno log10_tf32 log10_bf16 \
+		exp_bf16 exp_rno exp_tf32 \
+		exp2_bf16 exp2_rno exp2_tf32 \
+		exp10_bf16 exp10_rno exp10_tf32 \
+		sinh_bf16 sinh_rno sinh_tf32 \
+		cosh_bf16 cosh_rno cosh_tf32 \
+		cospi_bf16 cospi_rno cospi_tf32 \
+		sinpi_bf16 sinpi_rno sinpi_tf32
 
 floatsrcdir = float
 floatobjdir = obj
-
-floatrnosrcdir = float-rno
-floatrnoobjdir = rno-obj
-
 
 floatprogsrcdir = progressive
 floatprogobjdir = prog-obj
 
 floatsrc = $(patsubst %, $(floatsrcdir)/%.c, $(floatfiles))
 floatobj = $(patsubst %, $(floatobjdir)/%.o, $(floatfiles))
-
-floatrnosrc = $(patsubst %, $(floatrnosrcdir)/%.c, $(floatrnofiles))
-floatrnoobj = $(patsubst %, $(floatrnoobjdir)/%.o, $(floatrnofiles))
-
 
 floatprogsrc = $(patsubst %, $(floatprogsrcdir)/%.c, $(floatprogfiles))
 floatprogobj = $(patsubst %, $(floatprogobjdir)/%.o, $(floatprogfiles))
@@ -37,10 +34,6 @@ $(floatobjdir)/%.o: $(floatsrcdir)/%.c
 	@mkdir -p $(floatobjdir)
 	$(CC) -std=c11 -O3 -c $^ -I../include/ -o $@
 
-$(floatrnoobjdir)/%.o: $(floatrnosrcdir)/%.c
-	@mkdir -p $(floatrnoobjdir)
-	$(CC) -mfma -std=c11 -O3 -c $^ -I../include/ -o $@
-
 $(floatprogobjdir)/%.o: $(floatprogsrcdir)/%.c
 	@mkdir -p $(floatprogobjdir)
 	$(CC) -std=c11 -O3 -c $^ -I../include/ -o $@
@@ -48,11 +41,8 @@ $(floatprogobjdir)/%.o: $(floatprogsrcdir)/%.c
 floatlibm.a: $(floatobj)
 	ar rc $@ $^
 
-floatrnolibm.a: $(floatrnoobj)
-	ar rc $@ $^
-
 floatproglibm.a: $(floatprogobj)
 	ar rc $@ $^
 
 clean:
-	rm -rf float/*.o float/*~ floatlibm.a floatrnolibm.a floatproglibm.a  obj *~ float-rno/*.o rno-obj float-prog/*.o prog-obj
+	rm -rf floatlibm.a floatproglibm.a obj *~ float-prog/*.o prog-obj float/*.o float/*~ 

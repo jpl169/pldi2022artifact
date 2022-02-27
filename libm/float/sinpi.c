@@ -1,5 +1,5 @@
-#include "float_lib.h"
-#include "sinpicospi.h"
+#include "float/float_lib.h"
+#include "float/sinpicospi.h"
 
 #define PI 3.141592653589793115997963468544185161590576171875
 

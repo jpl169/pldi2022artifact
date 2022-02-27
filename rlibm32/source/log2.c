@@ -1,9 +1,9 @@
-#include <math.h>
-#include "float/float_lib.h"
-#include "float/log2.h"
+#include "float_headers/rlibm32.h"
+#include "constants.h"
+#include "float_headers/Log2.h"
 
-float rlibm_fast_log2(float x) {
-    float_x fix, fit;
+float rlibm_log2(float x) {
+    floatX fix, fit;
     fix.f = x;
     int m = 0;
     
@@ -36,21 +36,18 @@ float rlibm_fast_log2(float x) {
     fit.x |= 0x3F800000;
     
     double f = fix.f - fit.f;
-    f *= log_oneByF[FIndex];
-
-
-    double y = 3.8662151480904477507394290114461909979581832885742187500000000000000000e-01;
-    y *= f;
-    y += -3.6229559281288897798489756496564950793981552124023437500000000000000000e-01;
-    y *= f;
-    y += 4.8090713122852124516981575652607716619968414306640625000000000000000000e-01 ;
-    y *= f;
-    y += -7.2134753829891251619699232833227142691612243652343750000000000000000000e-01 ;
-    y *= f;
-    y += 1.4426950408983432172504990376182831823825836181640625000000000000000000e+00 ;
-    y *= f;
-
+    f *= __log_oneByF[FIndex];
     
-    return y + log2_lut[FIndex] + m;
+    double y = C4;
+    y *= f;
+    y += C3;
+    y *= f;
+    y += C2;
+    y *= f;
+    y += C1;
+    y *= f;
+    y += C0;
+    y *= f;
+    
+    return y + __log2_lut[FIndex] + m;
 }
-

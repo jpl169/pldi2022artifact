@@ -1,6 +1,6 @@
 #include <math.h>
-#include "float_lib.h"
-#include "log10.h"
+#include "float/float_lib.h"
+#include "float/log10.h"
 
 
 #define LOG102HIGH 0.30102999566398114250631579125183634459972381591796875

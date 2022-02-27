@@ -1,6 +1,6 @@
 #include <math.h>
-#include "float_lib.h"
-#include "exp2.h"
+#include "float/float_lib.h"
+#include "float/exp2.h"
 
 float rlibm_fast_exp2(float x) {
     float_x fx;
