@@ -13,6 +13,8 @@
 #include "rlibm_all.h"
 #include "rounding.h"
 
+enum RoundMode my_rnd_modes[5] = {RNE, RNN, RNP, RNZ, RNA};
+
 void RunTestForExponent() {
   unsigned long wrongCounts[3];
   for (int i = 0; i < 3; i++) wrongCounts[i] = 0;
@@ -44,14 +46,58 @@ void RunTestForExponent() {
     }
 
     // Check float results
-    double res = __ELEM_FP32_RNE__(fx.f);
-    double oracleResult = RoundDoubleToF8N(orc, 32, RNE);
-    double roundedRes = RoundDoubleToF8N(res, 32, RNE);
-    if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
-    if (oracleResult != roundedRes) {
-      wrongCounts[1]++;
-      wrongCounts[2]++;
-    }
+    #if (__ELEM_FP32_SAME__ == 1)
+      double res = __ELEM_FP32_RNE__(fx.f);
+
+      for (int rnd_index = 0; rnd_index < 5; rnd_index++) {
+        double oracleResult = RoundDoubleToF8N(orc, 32, my_rnd_modes[rnd_index]);
+        double roundedRes = RoundDoubleToF8N(res, 32, my_rnd_modes[rnd_index]);
+        
+        if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
+        if (oracleResult != roundedRes) {
+          if (rnd_index == 0) wrongCounts[1]++;
+          wrongCounts[2]++;
+        }
+      }
+    #else
+      // This is crlibm... Must do it separately
+      // RNE
+      double res = __ELEM_FP32_RNE__(fx.f);
+      double oracleResult = RoundDoubleToF8N(orc, 32, RNE);
+      double roundedRes = RoundDoubleToF8N(res, 32, RNE);
+      if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
+      if (oracleResult != roundedRes) {
+        wrongCounts[1]++;
+        wrongCounts[2]++;
+      }
+      // RNA
+      double res = __ELEM_FP32_RNA__(fx.f);
+      double oracleResult = RoundDoubleToF8N(orc, 32, RNA);
+      double roundedRes = RoundDoubleToF8N(res, 32, RNA);
+      if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
+      if (oracleResult != roundedRes) wrongCounts[2]++;
+
+      // RNZ
+      double res = __ELEM_FP32_RNZ__(fx.f);
+      double oracleResult = RoundDoubleToF8N(orc, 32, RNZ);
+      double roundedRes = RoundDoubleToF8N(res, 32, RNZ);
+      if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
+      if (oracleResult != roundedRes) wrongCounts[2]++;
+
+      // RNP
+      double res = __ELEM_FP32_RNP__(fx.f);
+      double oracleResult = RoundDoubleToF8N(orc, 32, RNP);
+      double roundedRes = RoundDoubleToF8N(res, 32, RNP);
+      if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
+      if (oracleResult != roundedRes) wrongCounts[2]++;
+
+      // RNN
+      double res = __ELEM_FP32_RNN__(fx.f);
+      double oracleResult = RoundDoubleToF8N(orc, 32, RNN);
+      double roundedRes = RoundDoubleToF8N(res, 32, RNN);
+      if (oracleResult != oracleResult && roundedRes != roundedRes) continue;
+      if (oracleResult != roundedRes) wrongCounts[2]++;
+    #endif
   }
   
   for (int i = 0; i < 3; i++) {
