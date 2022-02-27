@@ -14,13 +14,13 @@ then
    parallelism=$parArg
 fi
 
-echo -e "\033[1m* Checking Correctness of several libraries.\033[0m"
+echo -e "\033[1m* Checking Correctness tensorfloat32 output of several libraries.\033[0m"
 echo -e "\033[1m* When each function is completely tested, it will print the result\033[0m"
 echo -e "\033[1m\tRunning testing script in parallel\033[0m"
 echo -e "\033[1m\tParallelism: $parallelism jobs\033[0m"
 echo -e "\033[1m\tEstimated time: 3 seconds \033[0m"
 echo -e ""
-echo    "| function |    Using OurLibm    |    glibc dbl libm   |   Intel dbl libm    |    Using Crlibm     |    Using Rlibm32    |"
+echo    "| function | Using ProgLibm | glibc dbl libm | Intel dbl libm |    Using Rlibm32    |"
 echo    "--------------------------------------------------------------------------------------------------------------------------"
-echo    "|          | rne rnn rnp rnz rna | rne rnn rnp rnz rna | rne rnn rnp rnz rna | rne rnn rnp rnz rna | rne rnn rnp rnz rna |"
+echo    "|          |                | rne rnn rnp rnz rna | rne rnn rnp rnz rna | rne rnn rnp rnz rna | rne rnn rnp rnz rna |"
 cat ParallelCommand.txt | parallel -j $parallelism
