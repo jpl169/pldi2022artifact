@@ -21,7 +21,7 @@ void RunTestForExponent() {
   
   floatX fx;
   
-  for (unsigned long count = 0x0; count < 0x100000000; count += 0x80) {
+  for (unsigned long count = 0x0; count < 0x100000000; count += 0x1) {
     fx.x = count;
     double orc = __GEN_ELEM__(fx.f);
 
