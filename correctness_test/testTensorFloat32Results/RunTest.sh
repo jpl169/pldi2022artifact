@@ -21,7 +21,7 @@ echo -e "\033[1m\tParallelism: $parallelism jobs\033[0m"
 echo -e "\033[1m\tEstimated time: 3 seconds \033[0m"
 echo -e ""
 echo    "| function | Using ProgLibm   |  glibc dbl libm  |  Intel dbl libm  |   Using CR-LIBM  |  USING RLIBM-ALL |"
-echo    "--------------------------------------------------------------------------------------------------------------------------"
+echo    "-----------------------------------------------------------------------------------------------------------"
 echo    "|          | BF16 FP32 FP32   | BF16 FP32 FP32   | BF16 FP32 FP32   | BF16 FP32 FP32   | BF16 FP32 FP32   |"
 echo    "|          | TF32  RE  ALL RM | TF32  RE  ALL RM | TF32  RE  ALL RM | TF32  RE  ALL RM | TF32  RE  ALL RM |"
 cat ParallelCommand.txt | parallel -j $parallelism

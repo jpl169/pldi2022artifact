@@ -3,7 +3,7 @@
 echo -n  "| cospi(x) |  "
 ./proglibm/Cospi
 echo -n  " |  "
-echo -n  " N/A  N/A  N/A  "
+echo -n  " N/A  N/A  N/A "
 echo -n  " |  "
 ./intel_double/Cospi
 echo -n  " |  "
