@@ -9,5 +9,5 @@ echo -n  " |  "
 echo -n  " |  "
 ./crlibm/Log10
 echo -n  " |  "
-echo -ne " \033[0;32mo\033[0m    \033[0;32mo\033[0m    \033[0;32mo\033[0m     "
+echo -ne "\033[0;32mo\033[0m    \033[0;32mo\033[0m    \033[0;32mo\033[0m    "
 echo     " |  "
