@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -n  "| ln(x)     |  "
+echo -n  "| ln(x)    |  "
 ./proglibm/Log
 echo -n  " | "
 ./glibc_double/Log

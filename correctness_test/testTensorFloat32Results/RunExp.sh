@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -n  "| exp(x)  |  "
+echo -n  "| exp(x)   |  "
 ./proglibm/Exp
 echo -n  " | "
 ./glibc_double/Exp
