@@ -35,5 +35,7 @@ void RunTest(char* FileName) {
     }
   }
   
-  printf("total cycle  = %lu\n", time_total);
+  FILE* output = fopen(FileName);
+  fprintf(output, "%lu\n", time_total);
+  fclose(output);
 }
