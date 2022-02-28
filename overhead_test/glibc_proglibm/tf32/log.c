@@ -1,3 +1,4 @@
+#include "progressive/float_prog_lib.h"
 #define __ELEM__ rlibm_prog_tf32_log
 
 #include "LibTestHelper_tf32.h"

@@ -1,3 +1,4 @@
+#include "progressive/float_prog_lib.h"
 #define __ELEM__ rlibm_prog_bf16_log
 
 #include "LibTestHelper_bf16.h"

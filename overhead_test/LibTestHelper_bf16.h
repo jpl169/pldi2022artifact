@@ -1,7 +1,11 @@
+#ifdef __INTEL_COMPILER
+#include "mathimf.h"
+#else
 #define _GNU_SOURCE
+#include "math.h"
+#endif
+
 #include <stdio.h>
-#include "progressive/float_prog_lib.h"
-#include <math.h>
 #include <x86intrin.h>
 #include <stdlib.h>
 #include <string.h>

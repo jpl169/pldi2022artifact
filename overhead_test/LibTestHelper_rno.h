@@ -1,7 +1,11 @@
+#ifdef __INTEL_COMPILER
+#include "mathimf.h"
+#else
 #define _GNU_SOURCE
+#include "math.h"
+#endif
+
 #include <stdio.h>
-#include "progressive/float_prog_lib.h"
-#include <math.h>
 #include <x86intrin.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +18,7 @@ void RunTest(char* FileName) {
   unsigned long time_t1, time_t2;
   double res;
   unsigned int dummy;
-  for (count = 0x0; count < 0x100000000; count++) {
+  for (count = 0x0; count < 0x100000000; count += 0x40) {
     float_x xbase;
     xbase.x = count;
     float x = xbase.f;
@@ -30,5 +34,7 @@ void RunTest(char* FileName) {
     time_total += (time_t2 - time_t1);
   }
   
-  printf("total cycle  = %lu\n", time_total);
+  FILE* output = fopen(FileName, "w");
+  fprintf(output, "%lu\n", time_total);
+  fclose(output);
 }
