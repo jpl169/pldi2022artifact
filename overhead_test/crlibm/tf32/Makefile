@@ -9,7 +9,7 @@ obj = $(patsubst %, %, $(funcs))
 all: $(obj)
 
 %: %.c
-	$(CC) -std=c11 -O0 -frounding-math -fsignaling-nans -I../../../../include/ -I../../../../external/include/crlibm/ $^ ../../../../external/lib/libcrlibm.a ../../../../rlibm-rno/lib/float34ROMathLib.a -lgmp -lm -o $@
+	$(CC) -std=c11 -O0 -I../../ -frounding-math -fsignaling-nans -I../../../include/ -I../../../external/include/crlibm/ $^ ../../../external/lib/libcrlibm.a -lgmp -lm -o $@
 
 clean:
 	rm -rf *.o $(funcs) *~ *.txt

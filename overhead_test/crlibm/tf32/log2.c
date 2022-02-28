@@ -1,6 +1,7 @@
 #define __ELEM__ log2_rn
-
-#include "LibTestHelper.h"
+#include "common.h"
+#include "crlibm.h"
+#include "LibTestHelper_tf32.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fix, fit;
