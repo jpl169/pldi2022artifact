@@ -1,6 +1,5 @@
-#include "progressive/float_prog_lib.h"
 #define __ELEM__ rlibm_prog_tf32_exp
-
+#include "progressive/float_prog_lib.h"
 #include "LibTestHelper_tf32.h"
 
 int additionallyIgnoreThisInput(float x) {
