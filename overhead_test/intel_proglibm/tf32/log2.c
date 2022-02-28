@@ -1,6 +1,6 @@
 #define __ELEM__ rlibm_prog_tf32_log2
 #include "progressive/float_prog_lib.h"
-#include "LibTestHelper_bf16.h"
+#include "LibTestHelper_tf32.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fix, fit;

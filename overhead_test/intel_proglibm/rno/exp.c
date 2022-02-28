@@ -1,6 +1,6 @@
 #define __ELEM__ rlibm_prog_rno_exp
 #include "progressive/float_prog_lib.h"
-#include "LibTestHelper_bf16.h"
+#include "LibTestHelper_rno.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fx;
