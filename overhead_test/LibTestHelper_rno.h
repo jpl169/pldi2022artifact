@@ -19,7 +19,7 @@ void RunTest(char* FileName) {
   unsigned int dummy;
   double res;
   unsigned int dummy;
-  for (count = 0x0; count < 0x100000000; count += 0x40) {
+  for (count = 0x0; count < 0x100000000; count += 0x10) {
     float_x xbase;
     xbase.x = count;
     float x = xbase.f;
