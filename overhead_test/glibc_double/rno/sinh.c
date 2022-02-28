@@ -1,6 +1,7 @@
 #define __ELEM__ sinh
 
-#include "LibTestHelper.h"
+#include "common.h"
+#include "LibTestHelper_rno.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fx;

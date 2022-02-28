@@ -1,6 +1,7 @@
 #define __ELEM__ log10
+#include "common.h"
+#include "LibTestHelper_rno.h"
 
-#include "LibTestHelper.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fix, fit;

@@ -6,8 +6,6 @@
     #define	__ELEM__ exp10
 #endif
 
-#include <math.h>
-
 #include "LibTestHelper_bf16.h"
 
 int additionallyIgnoreThisInput(float x) {

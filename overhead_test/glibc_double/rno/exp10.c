@@ -1,6 +1,12 @@
-#define __ELEM__ exp10
+#define _GNU_SOURCE
+#if __APPLE__
+    #define	__ELEM__ __exp10
+#else
+    #define	__ELEM__ exp10
+#endif
+#include "common.h"
+#include "LibTestHelper_rno.h"
 
-#include "LibTestHelper.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fx;
