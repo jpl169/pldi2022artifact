@@ -6,12 +6,38 @@ import numpy as np
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
 
-overallLabel = ["ln", "log2", "log10", "exp", "sinpi", "cospi", "cosh", "sinh", "avg."]
+labels = ["ln", "log2", "log10", "exp", "sinpi", "cospi", "cosh", "sinh", "avg."]
 
-labels = overallLabel
-producebf16 = [1.67918667523887,3.67046782673387,3.3283413390626,2.0473430353463,2.33254549918587,3.0407754180216,1.52847432610141,1.3456669976736,2.2305200779018]
-producetf32 = [1.32354489752812,2.80300876386262,2.80616644876436,2.03873198952001,2.30862975380475,3.11596099371242,1.52366408199456,1.33567132918949,2.04902132920634]
-producefloat = [1.15315445450309,2.2550890761259,2.2335418172451,2.0167077210005,2.11737395097216,3.34775915166201,1.42228232135021,1.16163647798577,1.84995858948873]
+elemental_files = ["log.txt", "log2.txt", "log10.txt", "exp.txt", "sinpi.txt", "cospi.txt", "cosh.txt", "sinh.txt"]
+prog_bf16_files = [os.path.join("glibc_proglibm", "bf16", f) for f in elemental_files]
+prog_tf32_files = [os.path.join("glibc_proglibm", "tf32", f) for f in elemental_files]
+prog_rno_files = [os.path.join("glibc_proglibm", "rno", f) for f in elemental_files]
+glibc_bf16_files = [os.path.join("glibc_double", "bf16", f) for f in elemental_files]
+glibc_tf32_files = [os.path.join("glibc_double", "tf32", f) for f in elemental_files]
+glibc_rno_files = [os.path.join("glibc_double", "rno", f) for f in elemental_files]
+
+producebf16 = []
+producetf32 = []
+producefloat = []
+
+def readnumbers(files) :
+    result = []
+    for f in files :
+        with open(f) as fo :
+            result.append(float(fo.readline().strip()))
+    result.append(sum(result) / len(result))
+    return result
+
+prog_bf16 = readnumbers(prog_bf16_files)
+prog_tf32 = readnumbers(prog_tf32_files)
+prog_float = readnumbers(prog_rno_files)
+glibc_bf16 = readnumbers(glibc_bf16_files)
+glibc_tf32 = readnumbers(glibc_tf32_files)
+glibc_float = readnumbers(glibc_rno_files)
+
+producebf16 = (x / y for x, y in zip(glibc_bf16, prog_bf16))
+producetf32 = (x / y for x, y in zip(glibc_tf32, prog_tf32))
+producefloat = (x / y for x, y in zip(glibc_float, prog_float))
 
 producebf16 = [(x - 1.0) * 100.0 for x in producebf16]
 producetf32 = [(x - 1.0) * 100.0 for x in producetf32]
