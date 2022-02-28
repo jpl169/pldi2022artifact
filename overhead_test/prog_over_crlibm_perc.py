@@ -13,9 +13,9 @@ elemental_files = ["log.txt", "log2.txt", "log10.txt", "exp.txt", "sinpi.txt", "
 prog_bf16_files = [os.path.join("glibc_proglibm", "bf16", f) for f in elemental_files]
 prog_tf32_files = [os.path.join("glibc_proglibm", "tf32", f) for f in elemental_files]
 prog_rno_files = [os.path.join("glibc_proglibm", "rno", f) for f in elemental_files]
-glibc_bf16_files = [os.path.join("glibc_double", "bf16", f) for f in elemental_files]
-glibc_tf32_files = [os.path.join("glibc_double", "tf32", f) for f in elemental_files]
-glibc_rno_files = [os.path.join("glibc_double", "rno", f) for f in elemental_files]
+glibc_bf16_files = [os.path.join("crlibm", "bf16", f) for f in elemental_files]
+glibc_tf32_files = [os.path.join("crlibm", "tf32", f) for f in elemental_files]
+glibc_rno_files = [os.path.join("crlibm", "rno", f) for f in elemental_files]
 
 producebf16 = []
 producetf32 = []
