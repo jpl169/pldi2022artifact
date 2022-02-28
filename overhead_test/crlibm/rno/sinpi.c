@@ -1,6 +1,7 @@
 #define __ELEM__ sinpi_rn
-
-#include "LibTestHelper.h"
+#include "common.h"
+#include "crlibm.h"
+#include "LibTestHelper_rno.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fX;

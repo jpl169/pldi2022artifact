@@ -1,33 +1,12 @@
 #!/bin/bash
 
-echo -e "--crlibm--"
+echo -e "Testing crlibm float result performance"
 
-echo -e "Log"
-taskset -c 1 ./log
-
-echo -e "Log2"
-taskset -c 1 ./log2
-
-echo -e "Log10"
-taskset -c 1 ./log10
-
-echo -e "Exp"
-taskset -c 1 ./exp
-
-echo -e "Exp2"
-echo "N/A"
-
-echo -e "Exp10"
-echo "N/A"
-
-echo -e "Sinpi"
-taskset -c 1 ./sinpi
-
-echo -e "Cospi"
-taskset -c 1 ./cospi
-
-echo -e "Cosh"
-taskset -c 1 ./cosh
-
-echo -e "Sinh"
-taskset -c 1 ./sinh
+taskset -c 1 ./log log.txt
+taskset -c 1 ./log2 log2.txt
+taskset -c 1 ./log10 log10.txt
+taskset -c 1 ./exp exp.txt
+taskset -c 1 ./sinpi sinpi.txt
+taskset -c 1 ./cospi cospi.txt
+taskset -c 1 ./cosh cosh.txt
+taskset -c 1 ./sinh sinh.txt
