@@ -1,4 +1,5 @@
 #define __ELEM__ sinh_rn
+#include "common.h"
 #include "crlibm.h"
 #include "LibTestHelper_bf16.h"
 
