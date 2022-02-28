@@ -24,8 +24,8 @@ producefloat = []
 def readnumbers(files) :
     result = []
     for f in files :
-        with open(f) :
-            result.append(float(f.readline().strip()))
+        with open(f) as fo :
+            result.append(float(fo.readline().strip()))
     result.append(sum(result) / len(result))
     return result
 
