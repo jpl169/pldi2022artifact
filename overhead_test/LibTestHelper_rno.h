@@ -16,7 +16,7 @@ int additionallyIgnoreThisInput(float x);
 void RunTest(char* FileName) {
   unsigned long time_total = 0, count = 0;
   unsigned long time_t1, time_t2;
-  unsigned int dummy;
+  unsigned int accum;
   double res;
   unsigned int dummy;
   for (count = 0x0; count < 0x100000000; count += 0x10) {
