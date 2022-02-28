@@ -19,6 +19,7 @@ void RunTest(char* FileName) {
   unsigned long time_total = 0, count = 0;
   unsigned long time_t1, time_t2;
   double res;
+  unsigned long accum = 0;
   unsigned int dummy;
   
   for (int i = 0; i < TOTAL_RUN / (2 << 16); i++) {
@@ -35,11 +36,13 @@ void RunTest(char* FileName) {
         res = __ELEM__(x);
         time_t2 = __rdtscp(&dummy);
       } while (time_t1 >= time_t2);
+      if (res == 0.0) accum += 1;
       time_total += (time_t2 - time_t1);
     }
   }
   
   FILE* output = fopen(FileName, "w");
   fprintf(output, "%lu\n", time_total);
+  fprintf(output, "%lu\n", accum);
   fclose(output);
 }
