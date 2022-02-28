@@ -1,6 +1,6 @@
 #define __ELEM__ rlibm_prog_tf32_exp
 
-#include "LibTestHelper.h"
+#include "LibTestHelper_tf32.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fx;
