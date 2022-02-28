@@ -1,6 +1,6 @@
 #include "common.h"
 #include "rlibm_all.h"
-#include "LibTestHelper_bf16.h"
+#include "LibTestHelper_rno.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fX;

@@ -1,7 +1,7 @@
 #define __ELEM__ rlibm34_cosh
 #include "common.h"
 #include "rlibm_all.h"
-#include "LibTestHelper_bf16.h"
+#include "LibTestHelper_tf32.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fx;
