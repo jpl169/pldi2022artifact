@@ -1,3 +1,4 @@
+#include "common.h"
 #if __APPLE__
     #define	__ELEM__ __exp10
 #else

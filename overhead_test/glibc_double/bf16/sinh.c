@@ -1,3 +1,4 @@
+#include "common.h"
 #define __ELEM__ sinh
 
 #include "LibTestHelper_bf16.h"

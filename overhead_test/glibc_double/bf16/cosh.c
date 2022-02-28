@@ -1,3 +1,4 @@
+#include "common.h"
 #define __ELEM__ cosh
 
 #include "LibTestHelper_bf16.h"
