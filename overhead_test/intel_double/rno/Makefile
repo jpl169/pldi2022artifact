@@ -9,7 +9,7 @@ obj = $(patsubst %, %, $(funcs))
 all: $(obj)
 
 %: %.c
-	$(CC) -std=c11 -O0 -fp-model strict -no-ftz -I../../../../include/ $^ -o $@
+	$(CC) -std=c11 -O0 -fp-model strict -no-ftz -I../../ -I../../../include/ $^ -o $@
 
 clean:
 	rm -rf *.o $(funcs) *~ *.txt
