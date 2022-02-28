@@ -64,7 +64,6 @@ def autolabel(rects):
     """Attach a text label above each bar in *rects*, displaying its height."""
     for rect in rects:
         height = rect.get_height()
-        print(height)
         if height > 275:
             print("It is")
             ax.annotate('{:.1f}x'.format(height),
