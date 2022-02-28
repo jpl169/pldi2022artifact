@@ -25,7 +25,7 @@ def readnumbers(files) :
     result = []
     for f in files :
         with open(f) :
-            result.append(float(strip(f.readline())))
+            result.append(float(f.readline().strip()))
     result.append(sum(result) / len(result))
     return result
 
