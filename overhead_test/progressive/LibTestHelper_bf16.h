@@ -35,7 +35,7 @@ void RunTest(char* FileName) {
     }
   }
   
-  FILE* output = fopen(FileName);
+  FILE* output = fopen(FileName, "w");
   fprintf(output, "%lu\n", time_total);
   fclose(output);
 }
