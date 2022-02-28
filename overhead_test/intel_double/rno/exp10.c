@@ -1,5 +1,5 @@
 #define __ELEM__ exp10
-
+#include "common.h"
 #include "LibTestHelper_rno.h"
 
 int additionallyIgnoreThisInput(float x) {

@@ -1,5 +1,5 @@
 #define __ELEM__ log
-
+#include "common.h"
 #include "LibTestHelper_rno.h"
 
 int additionallyIgnoreThisInput(float x) {
