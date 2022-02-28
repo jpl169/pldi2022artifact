@@ -1,4 +1,4 @@
-##include "common.h"
+#include "common.h"
 #include "rlibm_all.h"
 #include "LibTestHelper_bf16.h"
 
