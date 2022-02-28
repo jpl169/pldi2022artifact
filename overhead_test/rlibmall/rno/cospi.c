@@ -1,3 +1,4 @@
+#define __ELEM__ rlibm34_cospi
 #include "common.h"
 #include "rlibm_all.h"
 #include "LibTestHelper_rno.h"
