@@ -1,4 +1,5 @@
 #define __ELEM__ exp2
+#include "common.h"
 
 #include "LibTestHelper_tf32.h"
 

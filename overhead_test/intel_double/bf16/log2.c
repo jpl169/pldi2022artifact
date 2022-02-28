@@ -1,4 +1,5 @@
 #define __ELEM__ log2
+#include "common.h"
 
 #include "LibTestHelper_bf16.h"
 

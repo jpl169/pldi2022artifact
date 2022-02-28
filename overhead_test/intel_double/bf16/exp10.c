@@ -1,4 +1,5 @@
 #define __ELEM__ exp10
+#include "common.h"
 
 #include "LibTestHelper_bf16.h"
 

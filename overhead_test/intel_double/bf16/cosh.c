@@ -1,5 +1,5 @@
 #define __ELEM__ cosh
-
+#include "common.h"
 #include "LibTestHelper_bf16.h"
 
 int additionallyIgnoreThisInput(float x) {

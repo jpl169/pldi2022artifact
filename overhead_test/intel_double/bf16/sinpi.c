@@ -1,4 +1,5 @@
 #define __ELEM__ sinpi
+#include "common.h"
 
 #include "LibTestHelper_bf16.h"
 
