@@ -2,7 +2,7 @@
 #include "mathimf.h"
 #else
 #define _GNU_SOURCE
-#include "math.h"
+#include <math.h>
 #endif
 
 #include <stdio.h>
