@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "common.h"
 #if __APPLE__
     #define	__ELEM__ __exp10
@@ -5,7 +6,6 @@
     #define	__ELEM__ exp10
 #endif
 
-#define _GNU_SOURCE
 #include <math.h>
 
 #include "LibTestHelper_bf16.h"
