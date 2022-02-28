@@ -1,6 +1,6 @@
 #define __ELEM__ cosh
 
-#include "LibTestHelper.h"
+#include "LibTestHelper_bf16.h"
 
 int additionallyIgnoreThisInput(float x) {
   float_x fx;
