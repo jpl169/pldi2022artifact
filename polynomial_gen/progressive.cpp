@@ -636,10 +636,11 @@ int main(int argc, char** argv){
     } while(n_violated_indices > 0 || !p);
     
     if(p){
+      printf("\nFINAL POLYNOMIAL THAT SATISFIES ALL INTERVALS:");
       rlibm_print_polyinfo(p);
     }
     else {
-      printf("\rCould not generate the polynomial that satisifies all intervals, check for partial results with a few violated intervals\n");
+      printf("\nCould not generate the polynomial that satisifies all intervals, check for partial results with a few violated intervals\n");
     }
     free(p);
     free(sampled_intervals);
