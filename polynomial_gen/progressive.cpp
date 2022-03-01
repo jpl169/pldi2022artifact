@@ -156,7 +156,7 @@ rlibm_generate_polynomial(psample_data* sintervals, size_t ssize,
 
   /* power_size[2] is float's termsize */
   for(int i = *prev_successful_degree; i < power_size[2]; i++){
-    printf("Trying to generate a polynomial with %d terms                 \r", i+1);
+    printf("Trying to generate a polynomial with %3d terms            \r", i+1);
 
     int count = 0;
     while(count < max_tries){
@@ -577,7 +577,7 @@ int main(int argc, char** argv){
       
       if(p){
 	n_violated_indices = rlibm_compute_violated_indices(violated_indices, intervals, nentries, p);
-	printf("# violated intervals: %lu, total iterations=%lu                \r", n_violated_indices, total_iterations);
+	printf("# violated intervals: %10lu, total iterations=%5lu \r", n_violated_indices, total_iterations);
   fflush(stdout);
 	
 	if(n_violated_indices <= VIOLATE_THRESHOLD){
