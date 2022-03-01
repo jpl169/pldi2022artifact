@@ -1,5 +1,6 @@
 #pragma once
 #include "mpfr.h"
+#include "math.h"
 
 using namespace std;
 
