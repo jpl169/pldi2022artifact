@@ -296,9 +296,9 @@ void rlibm_print_polyinfo(polynomial* p){
     exit(0);
   }
 
-  printf("Polynomial: y=%.70e x^(%d)",p->coeffs[0],p->power[0]);
+  printf("Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
   for(int j=1;j<p->termsize;j++){
-    printf(" + %.70e x^(%d)",p->coeffs[j],p->power[j]);
+    printf("\t+ %.70e x^(%d)",p->coeffs[j],p->power[j]);
   }
   printf("\n");
 
@@ -577,14 +577,16 @@ int main(int argc, char** argv){
       
       if(p){
 	n_violated_indices = rlibm_compute_violated_indices(violated_indices, intervals, nentries, p);
-	printf("number of violated intervals: %lu, total iterations=%lu \n", n_violated_indices, total_iterations);
+	printf("number of violated intervals: %lu, total iterations=%lu \r", n_violated_indices, total_iterations);
+  fflush(stdout);
 	
 	if(n_violated_indices <= VIOLATE_THRESHOLD){
-	  printf("VIOLATING INPUTS BELOW THRESHOLD:\n");
+    printf("\n")
+	  printf("CANDIDATE POLYNOMIAL WITH VIOLATED INPUTS BELOW THRESHOLD:\n");
 	  printf("starting input is %.70e\n", intervals[0].x);
 	  
 	  for(size_t m = 0; m < n_violated_indices; m++){
-	    printf("violated_input is %.70e, lb is %.70e, ub is %.70e\n", intervals[violated_indices[m]].x, intervals[violated_indices[m]].lb, intervals[violated_indices[m]].ub);
+	    printf("violated input: %.70e\n\tlb is %.70e\n\tub is %.70e\n", intervals[violated_indices[m]].x, intervals[violated_indices[m]].lb, intervals[violated_indices[m]].ub);
 	  }
 	  rlibm_print_polyinfo(p);
 	  if(RLIBM_EXIT_ON_THRESHOLD){
