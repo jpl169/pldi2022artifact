@@ -156,7 +156,8 @@ rlibm_generate_polynomial(psample_data* sintervals, size_t ssize,
 
   /* power_size[2] is float's termsize */
   for(int i = *prev_successful_degree; i < power_size[2]; i++){
-    printf("Trying to generate a polynomial with %3d terms            \r", i+1);
+    printf("\33[2K\r");
+    printf("Trying polynomial with %3d terms, ", i+1);
     fflush(stdout);
     int count = 0;
     while(count < max_tries){
@@ -577,16 +578,16 @@ int main(int argc, char** argv){
       
       if(p){
 	n_violated_indices = rlibm_compute_violated_indices(violated_indices, intervals, nentries, p);
-	printf("# violated intervals: %10lu, total iterations=%5lu \r", n_violated_indices, total_iterations);
+	printf("# violated intervals: %10lu, total iterations=%5lu", n_violated_indices, total_iterations);
   fflush(stdout);
 	
 	if(n_violated_indices <= VIOLATE_THRESHOLD){
     printf("\n");
 	  printf("CANDIDATE POLYNOMIAL WITH VIOLATED INPUTS BELOW THRESHOLD:\n");
-	  printf("starting input is %.70e\n", intervals[0].x);
+	  printf("starting input: %.70e\n", intervals[0].x);
 	  
 	  for(size_t m = 0; m < n_violated_indices; m++){
-	    printf("violated input: %.70e\n\tlb is %.70e\n\tub is %.70e\n", intervals[violated_indices[m]].x, intervals[violated_indices[m]].lb, intervals[violated_indices[m]].ub);
+	    printf("violated input: %.70e\n\t    lb: %.70e\n\t    ub: %.70e\n", intervals[violated_indices[m]].x, intervals[violated_indices[m]].lb, intervals[violated_indices[m]].ub);
 	  }
 	  rlibm_print_polyinfo(p);
 	  if(RLIBM_EXIT_ON_THRESHOLD){
