@@ -456,8 +456,8 @@ void IntervalGenerator2::ComputeReducedInterval(float input,
         }
         
         // Finally, set redIntLbP1 and redIntLbP2
-        redIntLbP1 = guessLbP1;
-        redIntLbP2 = guessLbP2;
+      if (!ubIsSpecCaseP1) redIntLbP1 = guessLbP1;
+      if (!ubIsSpecCaseP2) redIntLbP2 = guessLbP2;
     }
     
     // Similarly for lb, we do the same thing for ub's
