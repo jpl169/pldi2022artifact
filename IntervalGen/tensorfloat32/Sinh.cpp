@@ -242,22 +242,6 @@ int main(int argc, char** argv) {
   }
   
   IntervalGenerator2 SinhIntGen;
-  
-  int okay = 1;
-  for (unsigned long i = 0; i < 0x80000; i++) {
-    floatX input;
-    input.x = (i << 13);
-    float x = input.f;
-    
-    float result = SinhIntGen.MpfrCalculateFunction(x);
-    
-    if (input.x == 0x3d388000) {
-      printf("input until before the input %.100e (0x%x)\n", x, input.x);
-      printf("result = %.100e\n", result);
-      okay = 0;
-    }
-  }
-  
   SinhIntGen.CreateReducedIntervalFile(argv[1], argv[2]);
   
   return 0;

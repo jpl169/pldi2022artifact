@@ -344,8 +344,6 @@ void IntervalGenerator::ComputeReducedIntervals(unsigned long long xlow,
     
     unsigned long int inputX;
     for (inputX = xlow; inputX < xhigh; inputX++) {
-      printf("input = %lx\r", inputX);
-      fflush(stdout);
       floatX Xinput;
       Xinput.x = (inputX << 13);
       float input = Xinput.f;

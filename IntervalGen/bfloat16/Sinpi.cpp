@@ -273,28 +273,6 @@ int main(int argc, char** argv) {
   }
   
   IntervalGenerator2 SinpiIntGen;
-  
-  /*
-  int okay = 1;
-  for (unsigned long i = 0; i < 0x10000; i++) {
-    floatX input;
-    input.x = (i << 16);
-    float x = input.f;
-    
-    float result = SinpiIntGen.MpfrCalculateFunction(x);
-    
-    float yame = PI * (double)x;
-    yame = RoundDoubleToF8NWithSticky(yame, 16, RNE, 0);
-    
-    if (input.x == 0x3bc50000) {
-      //printf("okay until input %.100e (%x)\n", x, input.x - 0x10000);
-      printf("result = %.100e\n", result);
-      printf("yame   = %.100e\n", yame);
-    }
-  }
-  */
-  
-  
   SinpiIntGen.CreateReducedIntervalFile(argv[1], argv[2]);
   
   return 0;
