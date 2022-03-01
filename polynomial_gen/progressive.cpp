@@ -583,8 +583,7 @@ int main(int argc, char** argv){
   fflush(stdout);
 	
 	if(n_violated_indices <= VIOLATE_THRESHOLD){
-    printf("\n");
-	  printf("CANDIDATE POLYNOMIAL WITH VIOLATED INPUTS BELOW THRESHOLD:\n");
+	  printf("\rCANDIDATE POLYNOMIAL WITH %lu VIOLATED INPUTS:\n", n_violated_indices);
 	  printf("starting input: %.70e\n", intervals[0].x);
 	  
 	  for(size_t m = 0; m < n_violated_indices; m++){
@@ -601,14 +600,14 @@ int main(int argc, char** argv){
       }
       else {
 	if(total_iterations > MAX_ITERATIONS){
-	  printf("total iterations exceeded %d, terminating the polynomial geenerator\n", MAX_ITERATIONS);
+	  printf("\ftotal iterations exceeded %d, terminating the polynomial geenerator\n", MAX_ITERATIONS);
 	  if(p!= nullptr){
 	    free(p);
 	    p = nullptr;	  
 	  }
 	  break;
 	}
-	printf("failed to generate polynomial, resetting weights, total_iterations=%lu\n", total_iterations);
+	printf("\rfailed to generate polynomial, resetting weights, total_iterations=%lu\n", total_iterations);
 	prev_successful_degree = 0;      
 	rlibm_regenerate_random_values_and_reset_weights(intervals, nentries);
       }
@@ -620,7 +619,7 @@ int main(int argc, char** argv){
 	  matched_violated_indices = 0;
 	  n_violated_indices = 0;
 	  
-	  printf("not making progress, same number of violated indices, resetting weights, total_iterations=%lu\n", total_iterations);
+	  printf("\rnot making progress, same number of violated indices, resetting weights, total_iterations=%lu\n", total_iterations);
 	  prev_successful_degree = 0;
 	  rlibm_regenerate_random_values_and_reset_weights(intervals, nentries);
 	  if(p!= nullptr) {
@@ -640,7 +639,7 @@ int main(int argc, char** argv){
       rlibm_print_polyinfo(p);
     }
     else {
-      printf("Could not generate the polynomial that satisifies all intervals, check for partial results with a few violated intervals\n");
+      printf("\rCould not generate the polynomial that satisifies all intervals, check for partial results with a few violated intervals\n");
     }
     free(p);
     free(sampled_intervals);
