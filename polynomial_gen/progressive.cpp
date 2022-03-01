@@ -157,7 +157,7 @@ rlibm_generate_polynomial(psample_data* sintervals, size_t ssize,
   /* power_size[2] is float's termsize */
   for(int i = *prev_successful_degree; i < power_size[2]; i++){
     printf("Trying to generate a polynomial with %3d terms            \r", i+1);
-
+    fflush(stdout)
     int count = 0;
     while(count < max_tries){
       polynomial* p = rlibm_solve_with_soplex(sintervals, ssize, power, power_size, i+1);
