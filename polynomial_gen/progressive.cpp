@@ -583,7 +583,7 @@ int main(int argc, char** argv){
   fflush(stdout);
 	
 	if(n_violated_indices <= VIOLATE_THRESHOLD){
-	  printf("\rCANDIDATE POLYNOMIAL WITH %lu VIOLATED INPUTS:\n", n_violated_indices);
+	  printf("\33[2K\rCANDIDATE POLYNOMIAL WITH %lu VIOLATED INPUTS:\n", n_violated_indices);
 	  printf("starting input: %.70e\n", intervals[0].x);
 	  
 	  for(size_t m = 0; m < n_violated_indices; m++){
@@ -636,7 +636,7 @@ int main(int argc, char** argv){
     } while(n_violated_indices > 0 || !p);
     
     if(p){
-      printf("\nFINAL POLYNOMIAL THAT SATISFIES ALL INTERVALS:");
+      printf("\nFINAL POLYNOMIAL THAT SATISFIES ALL INTERVALS:\n");
       rlibm_print_polyinfo(p);
     }
     else {
