@@ -156,21 +156,22 @@ rlibm_generate_polynomial(psample_data* sintervals, size_t ssize,
 
   /* power_size[2] is float's termsize */
   for(int i = *prev_successful_degree; i < power_size[2]; i++){
-    printf("\33[2K\r");
+    printf("\r");
     printf("Trying polynomial with %3d terms, ", i+1);
     fflush(stdout);
     int count = 0;
     while(count < max_tries){
       polynomial* p = rlibm_solve_with_soplex(sintervals, ssize, power, power_size, i+1);
       if(p && rlibm_validate_and_fix_intervals(sintervals, ssize, p)){
-	*prev_successful_degree = i;
-	return p;
+        *prev_successful_degree = i;
+        return p;
       }
       if(p != nullptr){
-	free(p);
+        free(p);
       }
       count++;
-    }    
+    }
+    printf("\33[2K\r");
   }
   return nullptr;
 
