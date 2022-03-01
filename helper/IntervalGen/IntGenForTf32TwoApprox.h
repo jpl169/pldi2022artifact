@@ -4,7 +4,7 @@
 #include <queue>
 #include <map>
 #include <cstdio>
-#include "unistd.h"
+#include "math.h"
 
 mpfr_t mval;
 
@@ -14,16 +14,12 @@ int fileIndex = 0;
  Helper function declaration begin
  ################################################*/
 
-// Take a 34-bit floating point value in double representation and convert it to
-// a 34-bit floating point binary representation
-unsigned long ValToBinary34Bit(double);
-
 // Compute the rounding interval for a float value passed by argument 1. Lb and
 // Ub are returned in 2nd and 3rd argument, respectively
-// Argument 1   (double)  : float value v
+// Argument 1   (float)  : float value v
 // Argument 2   (double) : lb of rounding interval
 // Argument 3   (double) : ub of rounding interval
-int CalculateInterval(double, double&, double&);
+void CalculateInterval(float, double&, double&);
 
 // Error message when the initial guess on lb and ub leads to a result that is
 // outside of the rounding interval
@@ -60,13 +56,18 @@ void SaveIntervalsToAFile(std::map<double, IntData> intervals,
 class IntervalGenerator2 {
     public :
     
+    // The oracle that computes the correctly rounded result.
+    // Argument 1   (float) : original input x
+    // return value (float) : correctly rounded result of f(x)
+    float MpfrCalculateFunction(float);
+    
     // Defines the special case inputs. Accepts original input x. Returns
     // whether the input is a special case and f(x) for the input x.
     // Argument 1   (float) : original input x
     // return value (bool)  : whether x is special case or not
     // return value (float&): returned via argument 2. the result of f(x) if
     //                        x is a special case input
-  bool ComputeSpecialCase(float, double&);
+    bool ComputeSpecialCase(float, float&);
     
     // Range reduction function. Accepts original input x and returns the
     // reduced input x'
@@ -81,17 +82,7 @@ class IntervalGenerator2 {
     // Argument 2   (double) : y1' = P1(x')
     // Argument 3   (double) : y2' = P2(x')
     // return value (double) : approximation of f(x)
-    double OutputCompensation(double, double, double);
-    
-    // Provides an initial guess on what the reduced interval should be. This
-    // function should be used when output compensation function only uses one
-    // approximation function.
-    // Argument 1   (double) : reduced input x
-    // return value (double) : returned via argument 2. the lb for P1(x')
-    // return value (double) : returned via argument 3. the ub for P1(x')
-    // return value (double) : returned via argument 4. the lb for P2(x')
-    // return value (double) : returned via argument 5. the ub for P2(x')
-    bool GuessInitialLbUb(float, double, double, double,  double&, double&, double&, double&);
+    double OutputCompensation(float, double, double);
     
     // In some cases, we may need special treatment for the reduced interval.
     // This function is used to specify whether we should treat the reduced
@@ -118,6 +109,16 @@ class IntervalGenerator2 {
                         double, bool&, double&, double, bool&, double&,
                         double, bool&, double&, double, bool&, double&);
     
+    // Provides an initial guess on what the reduced interval should be. This
+    // function should be used when output compensation function only uses one
+    // approximation function.
+    // Argument 1   (double) : reduced input x
+    // return value (double) : returned via argument 2. the lb for P1(x')
+    // return value (double) : returned via argument 3. the ub for P1(x')
+    // return value (double) : returned via argument 4. the lb for P2(x')
+    // return value (double) : returned via argument 5. the ub for P2(x')
+    void GuessInitialLbUb(double, double&, double&, double&, double&);
+    
     // Computes reduced intervals from xlow to xhigh. If xlow > xhigh, then we
     // compute reduced intervals from 0 to 0x100000000. The reduced intervals are
     // added to the file since it is theoretically possible to have 2^32 reduced
@@ -130,21 +131,21 @@ class IntervalGenerator2 {
     //         upperbound in filename. Thus, each input will add 24 bytes to the
     //         file. The resulting file will have duplicate reduced inputs.
     void ComputeReducedIntervals(unsigned long long, unsigned long long,
-                                 FILE*, FILE*, FILE*);
+                                 FILE*, FILE*);
     
     // Computes reduced interval for one input x. The reduced intervals are
     // added to the file
     // Argument 1   (float) : original input x
     // Argument 2   (FILE*) : to store reduced input and interval for P1(x')
     // Argument 3   (FILE*) : to store reduced input and interval for P2(x')
-    void ComputeReducedInterval(float, double, FILE*, FILE*);
+    void ComputeReducedInterval(float, FILE*, FILE*);
     
     // Based on special case, range reduction, and output compensation function
     // create a file containing reduced inputs and reduced intervals. This file
     // contains merged reduced intervals sorted by reduced input.
     // Argument 1   (char*) : to store reduced constraint for P1(x')
     // Argument 2   (char*) : to store reduced constraint for P2(x')
-    void CreateReducedIntervalFile(char*, char*, char*);
+    void CreateReducedIntervalFile(char*, char*);
 
     // Based on special case, range reduction, and output compensation function
     // create a file containing reduced inputs and reduced intervals. This file
@@ -154,7 +155,7 @@ class IntervalGenerator2 {
     // Argument 3   (char*) : the name of the file to store P1(x') constraints
     // Argument 4   (char*) : the name of the file to store P2(x') constraints
     void CreateReducedIntervalFile(unsigned long long, unsigned long long,
-                                   char*, char*, char*);
+                                   char*, char*);
     
     // Given a file with filename that contains reduced inputs and intervals,
     // merge same reduced inputs and sort them by reduced input.
@@ -170,38 +171,17 @@ class IntervalGenerator2 {
     //                         intervals
     // Argument 3   (string) : A file with emrged inputs and intervalss
     void MergeFiles(string, string, string);
-
-    // Rounds an mpfr_t value to a float value using round to nearest tie goes
-    // to even mode. This is required to avoid double rounding error.
-    float FromMPFR(mpfr_t);
 };
 
-void IntervalGenerator2::CreateReducedIntervalFile(char* filename1, char* filename2,
-						   char* oracleFile) {
-  CreateReducedIntervalFile(0x0llu, 0x100000000llu, filename1, filename2, oracleFile);
+void IntervalGenerator2::CreateReducedIntervalFile(char* filename1,
+                                                  char* filename2) {
+    CreateReducedIntervalFile(0x0llu, 0x80000llu, filename1, filename2);
 }
 
 void IntervalGenerator2::CreateReducedIntervalFile(unsigned long long xlow,
-						   unsigned long long xhigh,
-						   char* filename1, char* filename2,
-						   char* oracleFile) {
-  
-  // Sanity check files
-  if(access(oracleFile, F_OK ) != 0 ) {
-    printf("Oracle file does not exist\n");
-    exit(0);
-  }
-  
-  if(access(filename1, F_OK ) == 0 ) {
-    printf("Reduced interval file already exists. Exiting to be safe\n");
-    exit(0);
-  }
-  
-  if(access(filename2, F_OK ) == 0 ) {
-    printf("Reduced interval file already exists. Exiting to be safe\n");
-    exit(0);
-  }
-
+                                                  unsigned long long xhigh,
+                                                  char* filename1,
+                                                  char* filename2) {
     string fileNameString1 = filename1;
     string largeFileName1 = fileNameString1.append("_large");
     string fileNameString2 = filename2;
@@ -209,10 +189,8 @@ void IntervalGenerator2::CreateReducedIntervalFile(unsigned long long xlow,
     
     FILE* largeFile1 = fopen(largeFileName1.c_str(), "w");
     FILE* largeFile2 = fopen(largeFileName2.c_str(), "w");
-    FILE* of = fopen(oracleFile, "r+");
     // Initially create a file with all the reduced inputs and intervals
-    ComputeReducedIntervals(xlow, xhigh, largeFile1, largeFile2, of);
-    fclose(of);
+    ComputeReducedIntervals(xlow, xhigh, largeFile1, largeFile2);
     fclose(largeFile1);
     fclose(largeFile2);
     
@@ -221,8 +199,8 @@ void IntervalGenerator2::CreateReducedIntervalFile(unsigned long long xlow,
     SortIntervalFile(largeFileName2, filename2);
     
     // Delete largeFileName file
-    //remove(largeFileName1.c_str());
-    //remove(largeFileName2.c_str());
+    remove(largeFileName1.c_str());
+    remove(largeFileName2.c_str());
 }
 
 void IntervalGenerator2::SortIntervalFile(string source, string dest) {
@@ -379,109 +357,53 @@ void IntervalGenerator2::MergeFiles(string s1, string s2, string d) {
 }
 
 void IntervalGenerator2::ComputeReducedIntervals(unsigned long long xlow,
-						 unsigned long long xhigh,
-						 FILE* file1, FILE* file2,
-						 FILE* oracleFile) {
+                                                unsigned long long xhigh,
+                                                FILE* file1, FILE* file2) {
   if (xlow > xhigh) {
-    xlow = 0x0;
-    xhigh = 0x100000000;
+      xlow = 0x0;
+      xhigh = 0x80000llu;
   }
   
   unsigned long long int inputX;
   for (inputX = xlow; inputX < xhigh; inputX++) {
-    if (inputX % 1000000 == 0) {
-      printf("inputX = %llu\r", inputX);
-      fflush(stdout);
-    }
+    printf("inputX = %llu\r", inputX);
+    fflush(stdout);
     floatX Xinput;
-    Xinput.x = inputX;
+    Xinput.x = (inputX << 13);
     float input = Xinput.f;
-    double oracleResult;
-    fread(&oracleResult, sizeof(double), 1, oracleFile);
-    ComputeReducedInterval(input, oracleResult, file1, file2);
+    ComputeReducedInterval(input, file1, file2);
   }
 }
 
-void IntervalGenerator2::ComputeReducedInterval(float input, double oracleResult,
+void IntervalGenerator2::ComputeReducedInterval(float input,
                                                 FILE* file1, FILE* file2) {
     // For each input, determine if it's special case or not. If it is, then
     // we continue to the next input
-    double specialCaseResult;
+    float specialCaseResult;
     if (ComputeSpecialCase(input, specialCaseResult)) return;
     
     // Compute the correctly rounded result
-    double corrResult = oracleResult;
+    float corrResult = MpfrCalculateFunction(input);
     
     // Compute rounding interval
     double roundingLb, roundingUb;
-    int stat = CalculateInterval(corrResult, roundingLb, roundingUb);
-    if (stat == -1) {
-      printf("Binary not even\n");
-      printf("input = %.100e\n", input);
-      exit(0);
-    }
-    
-    if (stat == -2) {
-      printf("Binary infinity/nan\n");
-      printf("input = %.100e\n", input);
-      exit(0);
-    }
-
-    if (roundingLb > corrResult || roundingUb < corrResult) {
-      printf("Rounding interval seems to be computed wrongly.\n");
-      printf("x            = %.100e\n", input);
-      printf("oracleResult = %.100e\n", oracleResult);
-      printf("roundingLb   = %.100e\n", roundingLb);
-      printf("roundingUb   = %.100e\n\n", roundingUb);
-      exit(0);
-    }
+    CalculateInterval(corrResult, roundingLb, roundingUb);
     
     // Compute reduced input
     double reducedInput = RangeReduction(input);
     
     // Get the initial guess for Lb and Ub
     double guessLbP1, guessUbP1, guessLbP2, guessUbP2;
-    bool useThis = GuessInitialLbUb(input,
-				    roundingLb, roundingUb,
-				    reducedInput,
-				    guessLbP1, guessUbP1,
-				    guessLbP2, guessUbP2);
-
-    if (useThis) {
-      // Since thiss is from user, let's do sanity check                                           
-      if (guessLbP1 > guessUbP1) {
-	printf("P1 interval is empty for :\n");
-	printf("input = %.100e\n", input);
-	printf("P1 Lb = %.100e\n", guessLbP1);
-	printf("P1 Ub = %.100e\n", guessUbP1);
-	printf("Aborting...\n");
-	exit(0);
-      }
-      
-      if (guessLbP2 > guessUbP2) {
-	printf("P2 interval is empty for :\n");
-	printf("input = %.100e\n", input);
-	printf("P2 Lb = %.100e\n", guessLbP2);
-	printf("P2 Ub = %.100e\n", guessUbP2);
-	printf("Aborting...\n");
-	exit(0);
-      }
-      // Save reduced input, lb, and ub to files.                                                  
-      fwrite(&reducedInput, sizeof(double), 1, file1);
-      fwrite(&guessLbP1, sizeof(double), 1, file1);
-      fwrite(&guessUbP1, sizeof(double), 1, file1);
-      fwrite(&reducedInput, sizeof(double), 1, file2);
-      fwrite(&guessLbP2, sizeof(double), 1, file2);
-      fwrite(&guessUbP2, sizeof(double), 1, file2);
-      return;
-    }
+    GuessInitialLbUb(reducedInput,
+                     guessLbP1, guessUbP1,
+                     guessLbP2, guessUbP2);
     
     // In a while loop, keep increasing lb and ub using binary search method to
     // find largest reduced interval
     double redIntLbP1, redIntUbP1, redIntLbP2, redIntUbP2, tempResult;
     bool lbIsSpecCaseP1 = false, ubIsSpecCaseP1 = false;
     bool lbIsSpecCaseP2 = false, ubIsSpecCaseP2 = false;
-    
+
     // Determine if there are any special case reduced interval lb/ub
     SpecCaseRedInt(input,
                    guessLbP1, lbIsSpecCaseP1, redIntLbP1,
@@ -494,94 +416,94 @@ void IntervalGenerator2::ComputeReducedInterval(float input, double oracleResult
     // special cases. In those cases, we do not change them.
     
     if (!lbIsSpecCaseP1 || !lbIsSpecCaseP2) {
-      // Check if we can lower the lower bound more
-      tempResult = OutputCompensation(input, guessLbP1, guessLbP2);
-      // If the initial guess puts us outside of rounding interval, there
-      // is nothing more we can do
-      if (tempResult < roundingLb || tempResult > roundingUb) {
-	CalcRedIntErrorMsg1(input, roundingLb, roundingUb,
-			    guessLbP1, guessUbP1,
-			    guessLbP2, guessUbP2, tempResult);
-      }
-      
-      // Otherwisse, we keep lowering lb's and see if we are still inside
-      // the rounding interval
-      unsigned long long step = 0x1000000000000;
-      doubleX dx1, dx2;
-      
-      while (step > 0) {
-	dx1.d = guessLbP1;
-	if (!lbIsSpecCaseP1) {
-	  if (dx1.d >= 0) dx1.x -= step;
-	  else dx1.x += step;
-	}
+        // Check if we can lower the lower bound more
+        tempResult = OutputCompensation(input, guessLbP1, guessLbP2);
+        // If the initial guess puts us outside of rounding interval, there
+        // is nothing more we can do
+        if (tempResult < roundingLb || tempResult > roundingUb) {
+            CalcRedIntErrorMsg1(input, roundingLb, roundingUb,
+                                guessLbP1, guessUbP1,
+                                guessLbP2, guessUbP2, tempResult);
+        }
         
-	dx2.d = guessLbP2;
-	if (!lbIsSpecCaseP2) {
-	  if (dx2.d >= 0) dx2.x -= step;
-	  else dx2.x += step;
-	}
+        // Otherwisse, we keep lowering lb's and see if we are still inside
+        // the rounding interval
+        unsigned long long step = 0x1000000000000;
+        doubleX dx1, dx2;
         
-	tempResult = OutputCompensation(input, dx1.d, dx2.d);
-	if (tempResult >= roundingLb && tempResult <= roundingUb) {
-	  // It's safe to lower the lb
-	  guessLbP1 = dx1.d;
-	  guessLbP2 = dx2.d;
-	} else {
-	  // Otherwise decrease the step by half
-	  step /= 2;
-	}
-      }
-      
-      // Finally, set redIntLbP1 and redIntLbP2
-      redIntLbP1 = guessLbP1;
-      redIntLbP2 = guessLbP2;
+        while (step > 0) {
+            dx1.d = guessLbP1;
+            if (!lbIsSpecCaseP1) {
+                if (dx1.d >= 0) dx1.x -= step;
+                else dx1.x += step;
+            }
+            
+            dx2.d = guessLbP2;
+            if (!lbIsSpecCaseP2) {
+                if (dx2.d >= 0) dx2.x -= step;
+                else dx2.x += step;
+            }
+            
+            tempResult = OutputCompensation(input, dx1.d, dx2.d);
+            if (tempResult >= roundingLb && tempResult <= roundingUb) {
+                // It's safe to lower the lb
+                guessLbP1 = dx1.d;
+                guessLbP2 = dx2.d;
+            } else {
+                // Otherwise decrease the step by half
+                step /= 2;
+            }
+        }
+        
+        // Finally, set redIntLbP1 and redIntLbP2
+        redIntLbP1 = guessLbP1;
+        redIntLbP2 = guessLbP2;
     }
     
     // Similarly for lb, we do the same thing for ub's
     if (!ubIsSpecCaseP1 || !ubIsSpecCaseP2) {
-      // Check if we can increase the upper bound more
-      tempResult = OutputCompensation(input, guessUbP1, guessUbP2);
-      // If the initial guess puts us outside of rounding interval, there
-      // is nothing more we can do
-      if (tempResult < roundingLb || tempResult > roundingUb) {
-	CalcRedIntErrorMsg1(input, roundingLb, roundingUb,
-			    guessLbP1, guessUbP1,
-			    guessLbP2, guessUbP2, tempResult);
-      }
-      
-      // Otherwisse, we keep increasing ub's and see if we are still
-      // inside the rounding interval
-      unsigned long long step = 0x1000000000000;
-      doubleX dx1, dx2;
-      
-      while (step > 0) {
-	dx1.d = guessUbP1;
-	if (!ubIsSpecCaseP1) {
-	  if (dx1.d >= 0) dx1.x += step;
-	  else dx1.x -= step;
-	}
+        // Check if we can increase the upper bound more
+        tempResult = OutputCompensation(input, guessUbP1, guessUbP2);
+        // If the initial guess puts us outside of rounding interval, there
+        // is nothing more we can do
+        if (tempResult < roundingLb || tempResult > roundingUb) {
+            CalcRedIntErrorMsg1(input, roundingLb, roundingUb,
+                                guessLbP1, guessUbP1,
+                                guessLbP2, guessUbP2, tempResult);
+        }
         
-	dx2.d = guessUbP2;
-	if (!ubIsSpecCaseP2) {
-	  if (dx2.d >= 0) dx2.x += step;
-	  else dx2.x -= step;
-	}
+        // Otherwisse, we keep increasing ub's and see if we are still
+        // inside the rounding interval
+        unsigned long long step = 0x1000000000000;
+        doubleX dx1, dx2;
         
-	tempResult = OutputCompensation(input, dx1.d, dx2.d);
-	if (tempResult >= roundingLb && tempResult <= roundingUb) {
-	  // It's safe to lower the lb
-	  guessUbP1 = dx1.d;
-	  guessUbP2 = dx2.d;
-	} else {
-	  // Otherwise decrease the step by half
-	  step /= 2;
-	}
-      }
-      
-      // Finally, set redIntLbP1 and redIntLbP2
-      redIntUbP1 = guessUbP1;
-      redIntUbP2 = guessUbP2;
+        while (step > 0) {
+            dx1.d = guessUbP1;
+            if (!ubIsSpecCaseP1) {
+                if (dx1.d >= 0) dx1.x += step;
+                else dx1.x -= step;
+            }
+            
+            dx2.d = guessUbP2;
+            if (!ubIsSpecCaseP2) {
+                if (dx2.d >= 0) dx2.x += step;
+                else dx2.x -= step;
+            }
+            
+            tempResult = OutputCompensation(input, dx1.d, dx2.d);
+            if (tempResult >= roundingLb && tempResult <= roundingUb) {
+                // It's safe to lower the lb
+                guessUbP1 = dx1.d;
+                guessUbP2 = dx2.d;
+            } else {
+                // Otherwise decrease the step by half
+                step /= 2;
+            }
+        }
+        
+        // Finally, set redIntLbP1 and redIntLbP2
+        redIntUbP1 = guessUbP1;
+        redIntUbP2 = guessUbP2;
     }
     
     // Save reduced input, lb, and ub to files.
@@ -593,149 +515,77 @@ void IntervalGenerator2::ComputeReducedInterval(float input, double oracleResult
     fwrite(&redIntUbP2, sizeof(double), 1, file2);
 }
 
-unsigned long ValToBinary34Bit(double val) {
-    doubleX dx;
-    dx.d = val;
-    unsigned long result = 0UL;
+// Helper function implementation
 
-    // Extract sign and put it in 34th position from the right
-    if ((dx.x & 0x8000000000000000UL) != 0UL) result = 0x200000000UL;
-
-    // Extract exponent and put it in 33rd ~ 26th position from the right
-    // val is a value in the 34-bit floating point. Thus, it will never be
-    // denormal in terms of double. We can find the exponent value from val's
-    // exponent values
-    unsigned long expBit = (dx.x & 0x7FF0000000000000UL) >> (52UL);
-    long exp = (long)expBit - 1023L;
-    exp += 127;
-    expBit = (unsigned long)exp;
-    if (exp < 1L) expBit = 0x0UL;
-    result |= (expBit << 25UL);
-
-    // Extract mantissa and put it in 25th ~ 1st position from the right
-    unsigned long mantissa = (dx.x & 0x000FFFFFFFFFFFFFUL) >> 27UL;
-    // If it's denormalized value, then make it into denormal mantissa
-    if (exp < 1L) {
-        mantissa |= 0x2000000UL;
-        // Figure out how many bits to shift right
-        long shiftAmount = 1L - exp;
-        mantissa >>= (unsigned long)shiftAmount;
-    }
-    result |= mantissa;
-    return result;
-}
-
-double Binary34BitToVal(unsigned long binary) {
-  // Take care of special cases
-  // 1. zero
-  if ((binary & 0x1FFFFFFFFUL) == 0UL) return 0.0;
-  // 2. infinity
-  if ((binary & 0x3FFFFFFFFUL) == 0x1FE000000UL) return 1.0 / 0.0;
-  if ((binary & 0x3FFFFFFFFUL) == 0x3FE000000UL) return -1.0 / 0.0;
-  // 3. NaN
-  if ((binary & 0x1FE000000UL) == 0x1FE000000UL) return 0.0 / 0.0;
-  
-  // None special case
-  doubleX result;
-  result.x = 0UL;
-  // 1. Separate out sign, exponent, mantissa
-  unsigned long sign     = (binary & 0x200000000UL);
-  unsigned long expBit   = (binary & 0x1FE000000UL) >> 25UL;
-  unsigned long mantissa = (binary & 0x001FFFFFFUL);
-  
-  // 2. Set sign to result:
-  if (sign != 0) result.x = 0x8000000000000000;
-  
-  // 3. Find exponent value and adjust expBit and mantissa accordingly
-  if (expBit == 0UL) {
-    // denormal value                                                                            
-    long expValue = -126L;
-    // 0000 0000 0000 0000 0000 0000 0000 0000 0000 000x xxxx xxxx ...
-    unsigned long movedMantissa = mantissa << 39UL;
-    // Find out how many leading zeroes there are
-    while ((movedMantissa & 0x8000000000000000UL) == 0UL) {
-      expValue--;
-      movedMantissa <<= 1UL;
-    }
-    // Remove the leading 1
-    expValue--;
-    movedMantissa <<= 1UL;
-    // Now MSB is the 1st mantissa bit. Move it towards where it needs
-    // to be for a double representation
-    mantissa = movedMantissa >> 12UL;
-    expValue += 1023L;
-    expBit = (unsigned long)expValue;
-  } else {
-    long expValue = (long)expBit;
-    expValue -= 127L;
-    expValue += 1023L;
-    expBit = (unsigned long)expValue;
-    mantissa <<= 27UL;
+void CalculateInterval(float x, double& lb, double& ub) {
+  floatX xi;
+  doubleX di;
+  xi.f = x;
+  double dx = x;
+  // Take care of special cases:
+  if (x == 0.0) {
+    xi.x = 0x80002000;
+    double lower = xi.f;
+    lb = lower / 2;
+    xi.x = 0x00002000;
+    double upper = xi.f;
+    ub = upper / 2;
+    return;
   }
-  
-  expBit <<= 52UL;
-  
-  // 4. Add expBit and mantissa to double representation
-  result.x |= expBit;
-  result.x |= mantissa;
-  return result.d;
-}
 
-int CalculateInterval(double x, double& lb, double& ub) {
-  // 1. Convert double to a 34-bit binary representation
-  unsigned long binary = ValToBinary34Bit(x);
-  
-  // Have to make sure that this binary is not even. We should have
-  // weeded all of it out in the special case
-  if ((binary & 0x1UL) == 0) return -1;
-  
-  // Binary should not be NaN or Infinity, because we should have
-  // taken care of them in special cases as well
-  // s1 1111 111x xxxx xxxx xxxx xxxx xxxx xxxx
-  if ((binary & 0x1FE000000UL) == 0x1FE000000UL) return -2;
-  
-  if ((binary & 0x200000000UL) == 0) {
-    // x is positive.
-    // 2. Add +1 ulp
-    unsigned long ubBinary = binary + 1UL;
-    // 3. Convert that to double
-    doubleX dx;
-    dx.d = Binary34BitToVal(ubBinary);
-    // 4. Subtract 1 ulp from double
-    dx.x--;
-    ub = dx.d;
+  if (x < 0.0) {
+    if (xi.x == 0xFF7FE000) {
+      double lower = -pow(2.0, 128.0);
+      lb = (dx + lower) / 2;
+    } else {
+      xi.x += 0x2000;
+      double lower = xi.f;
+      lb = (dx + lower) / 2;
+      xi.x -= 0x2000;
+    }
     
-    // 5. Subtract -1 ulp
-    unsigned long lbBinary = binary - 1UL;
-    // 6. Convert that to double
+    xi.x -= 0x2000;
+    double upper = xi.f;
+    ub = (dx + upper) / 2;
     
-    dx.d = Binary34BitToVal(lbBinary);
-    // 7. Add 1 ulp from double
-    dx.x++;
-    lb = dx.d;
-  } else {
-    // x is negative.
-    // 2. Add +1 ulp
-    unsigned long lbBinary = binary + 1UL;
-    // 3. Convert that to double
-    
-    // 4. Subtract 1 ulp from double
-    doubleX dx;
-    dx.d = Binary34BitToVal(lbBinary);
-    dx.x--;
-    lb = dx.d;
-    
-    // 5. Subtract -1 ulp
-    unsigned long ubBinary = binary - 1UL;
-    // 6. Convert that to double
-    
-    // 7. Add 1 ulp from double
-    dx.d = Binary34BitToVal(ubBinary);
-    dx.x++;
-    ub = dx.d;
+    // Inclusive or exclusive?
+    xi.f = x;
+    if ((xi.x & 0x2000) != 0) {
+      di.d = lb;
+      di.x --;
+      lb = di.d;
+      di.d = ub;
+      di.x ++;
+      ub = di.d;
+    }
+    return;
   }
-  
-  return 0;
+
+  // Otherwise x > 0.0
+  xi.x -= 0x2000;
+  double lower = xi.f;
+  lb = (dx + lower) / 2;
+  xi.x += 0x2000;
+
+  if (xi.x == 0x7F7FE000) {
+    double upper = pow(2.0, 128.0);
+    ub = (dx + upper) / 2;
+  } else {
+    xi.x += 0x2000;
+    double upper = xi.f;
+    ub = (dx + upper) / 2;
+  }
+
+  // inclusive or exclusive?
+  xi.f = x;
+  if ((xi.x & 0x2000) != 0) {
+    di.d = lb;
+    di.x ++;
+    lb = di.d;
+    di.d = ub;
+    di.x --;
+    ub = di.d;
+  }
 }
 
 void CalcRedIntErrorMsg1(float input, double roundingLb, double roundingUb,
