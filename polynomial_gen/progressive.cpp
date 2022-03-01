@@ -300,7 +300,7 @@ void rlibm_print_polyinfo(polynomial* p){
 
   printf("Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
   for(int j=1;j<p->termsize;j++){
-    printf("\t+ %.70e x^(%d)",p->coeffs[j],p->power[j]);
+    printf("\t     + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
   }
   printf("\n");
 
