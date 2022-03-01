@@ -581,7 +581,7 @@ int main(int argc, char** argv){
   fflush(stdout);
 	
 	if(n_violated_indices <= VIOLATE_THRESHOLD){
-    printf("\n")
+    printf("\n");
 	  printf("CANDIDATE POLYNOMIAL WITH VIOLATED INPUTS BELOW THRESHOLD:\n");
 	  printf("starting input is %.70e\n", intervals[0].x);
 	  
