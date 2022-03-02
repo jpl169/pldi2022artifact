@@ -1,4 +1,0 @@
-#!/bin/bash
-mkdir -p ${FLOAT34INTERVALPATH}
-
-./Log2 ${FLOAT34INTERVALPATH}/Float34ROLog2Intervals ${ORACLEPATH}/Float34ROLog2Oracle

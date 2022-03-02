@@ -3,7 +3,7 @@ objects = Log2
 
 CC=g++
 
-INCLUDES= -I$(SOPLEXPATH)/src -I../../helper/
+INCLUDES= -I$(SOPLEXPATH)/src -I../../../helper/
 
 CPP_FLAGS= -O2
 

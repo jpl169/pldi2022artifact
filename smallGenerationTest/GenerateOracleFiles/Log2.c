@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
         exit(0);
     }
     
-    RunTestHelper(argv[1], 0x3f800000, 0x40000000);
+    RunTest(argv[1], 0x3f800000, 0x40000000);
     mpfr_clear(mval);
     return 0;
 }
