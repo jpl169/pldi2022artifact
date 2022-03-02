@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -e "Testing proglibm bf16 function performance"
+echo -e "Testing proglibm compiled with icc bf16 function performance"
 
 taskset -c 1 ./log log.txt
 taskset -c 1 ./log2 log2.txt
