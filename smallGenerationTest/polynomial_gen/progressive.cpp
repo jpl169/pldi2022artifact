@@ -1,10 +1,8 @@
 #include "rlibm-fast.h"
 
-#include <immintrin.h>
 
-
-polynomial* rlibm_solve_with_soplex(sample_data* sintervals,
-				    size_t ssize, int* power, int termsize){
+polynomial* rlibm_solve_with_soplex(psample_data* sintervals,
+				    size_t ssize, int** power, int* power_size, int termsize){
   
   SoPlex mysoplex;
   mysoplex.setBoolParam(SoPlex::RATFACJUMP,true);
@@ -35,8 +33,11 @@ polynomial* rlibm_solve_with_soplex(sample_data* sintervals,
     
     for(int j=0; j<termsize;j++){
       Rational toAdd(1.0);
-      for(int k=0;k<power[j];k++) toAdd*=xValR;
-
+      if(j < power_size[sintervals[i].rep])
+	for(int k=0;k<power[sintervals[i].rep][j];k++) toAdd*=xValR;
+      else
+	toAdd *= 0.0;
+      
       row1.add(j,toAdd);
     }
         
@@ -58,7 +59,7 @@ polynomial* rlibm_solve_with_soplex(sample_data* sintervals,
     /* generate the polynomial as a plain structure */
     polynomial* p = (polynomial *) calloc(1, sizeof(polynomial));
     p->termsize = termsize;
-    p->power = power;
+    p->power = power[2];
     p->coeffs = (double *) calloc(termsize, sizeof(double));
     
     for(int i=0;i<termsize;i++)
@@ -70,7 +71,7 @@ polynomial* rlibm_solve_with_soplex(sample_data* sintervals,
 
     polynomial* p = (polynomial *) calloc(1, sizeof(polynomial));
     p->termsize = termsize;
-    p->power = power;
+    p->power = power[2];
     p->coeffs = (double *) calloc(termsize, sizeof(double));
     
     for(int i=0;i<termsize;i++)
@@ -91,49 +92,6 @@ void check_sorted(sample_info* sampled_indices, size_t ssize){
   }
   
 }
-
-#if 0
-double fma (double x, double y, double z){
-  double result;
-  __m128d xmm = _mm_load_sd(&x);           
-  __m128d ymm = _mm_load_sd(&y);           
-  __m128d zmm = _mm_load_sd(&z);
-  __m128d r = _mm_fmadd_sd(xmm, ymm, zmm);
-  _mm_store_sd(&result, r);
-  return result;
-}
-#endif
-
-double rlibm_log_poly_eval(double x, polynomial* poly){
-
-  double a0 = 0.0;
-  double a1 = poly-> coeffs[0];
-  double a2 = poly-> coeffs[1];
-  double a3 = poly-> coeffs[2];
-  double a4 = poly-> coeffs[3];
-  double a5 = poly-> coeffs[4];
-
-
-#if 0  
-  double a0 = poly-> coeffs[0];
-  double a1 = poly-> coeffs[1];
-  double a2 = poly-> coeffs[2];
-  double a3 = poly-> coeffs[3];
-  double a4 = poly-> coeffs[4];
-  double a5 = poly-> coeffs[5];
-#endif
-  
-  __m256d xmm = _mm256_set1_pd(x);
-  __m256d a25 = _mm256_set_pd(0.0, x, a5, a2);
-  __m256d a14 = _mm256_set_pd(0.0, 0.0, a4, a1);
-  __m256d a03 = _mm256_set_pd(0.0, 0.0, a3, a0);
-  // r1 = (0, x^2, a5*x + a4, a2*x + a1)
-  __m256d r1 = _mm256_fmadd_pd(a25, xmm, a14);
-  // r2 = (0, x^3, (a5*x + a4)*x + a3, (a2*x + a1)*x + a0
-  __m256d r2 = _mm256_fmadd_pd(r1, xmm, a03);
-  return fma(r2[2], r2[1], r2[0]);
-}
-
 
 
 double rlibm_poly_evaluation(double x, polynomial* poly){
@@ -157,12 +115,12 @@ double rlibm_poly_evaluation(double x, polynomial* poly){
   return ret_val;
 }
 
-bool rlibm_validate_and_fix_intervals(sample_data* sintervals,
+bool rlibm_validate_and_fix_intervals(psample_data* sintervals,
 				      size_t ssize, polynomial* poly){
 
   bool return_val = true;
   for(size_t i = 0; i < ssize; i++){
-    double y = rlibm_log_poly_eval(sintervals[i].x, poly);
+    double y = rlibm_poly_evaluation(sintervals[i].x, poly);
 
     if(y < sintervals[i].orig_lb){
       return_val = false;
@@ -193,24 +151,27 @@ bool rlibm_validate_and_fix_intervals(sample_data* sintervals,
 }
 
 polynomial*
-rlibm_generate_polynomial(sample_data* sintervals, size_t ssize,
-			  int* power, int power_size, int max_tries, int *prev_successful_degree){
+rlibm_generate_polynomial(psample_data* sintervals, size_t ssize,
+			  int** power, int* power_size, int max_tries, int *prev_successful_degree){
 
-  for(int i = 4; i < power_size; i++){
-    printf("Trying to generate a polynomial  with %d terms \n", i+1);
-
+  /* power_size[2] is float's termsize */
+  for(int i = *prev_successful_degree; i < power_size[2]; i++){
+    printf("\r");
+    printf("Trying polynomial with %3d terms, ", i+1);
+    fflush(stdout);
     int count = 0;
     while(count < max_tries){
-      polynomial* p = rlibm_solve_with_soplex(sintervals, ssize, power, i+1);
+      polynomial* p = rlibm_solve_with_soplex(sintervals, ssize, power, power_size, i+1);
       if(p && rlibm_validate_and_fix_intervals(sintervals, ssize, p)){
-	*prev_successful_degree = i;
-	return p;
+        *prev_successful_degree = i;
+        return p;
       }
       if(p != nullptr){
-	free(p);
+        free(p);
       }
       count++;
-    }    
+    }
+    printf("\33[2K\r");
   }
   return nullptr;
 
@@ -235,7 +196,7 @@ void rlibm_print_sample(sample_info* sampled_indices, size_t size){
 }
 
 void rlibm_weighted_random_sample(sample_info* sampled_indices, size_t ssize,
-				  interval_data* intervals, size_t nentries){
+				  pinterval_data* intervals, size_t nentries){
 
   for(size_t i = 0; i < ssize; i++){
     sampled_indices[i].key = pow(intervals[i].u, 1./(intervals[i].w));
@@ -270,11 +231,11 @@ void rlibm_weighted_random_sample(sample_info* sampled_indices, size_t ssize,
 }
 
 
-size_t rlibm_compute_violated_indices(size_t* violated_indices, interval_data* intervals, size_t nentries, polynomial* poly){
+size_t rlibm_compute_violated_indices(size_t* violated_indices, pinterval_data* intervals, size_t nentries, polynomial* poly){
 
   size_t num_violated_indices = 0;
   for(size_t i = 0; i < nentries; i++){
-    double y = rlibm_log_poly_eval(intervals[i].x, poly);
+    double y = rlibm_poly_evaluation(intervals[i].x, poly);
     if( y < intervals[i].lb || y > intervals[i].ub){
       violated_indices[num_violated_indices] = i;
       num_violated_indices++;
@@ -284,10 +245,9 @@ size_t rlibm_compute_violated_indices(size_t* violated_indices, interval_data* i
 }
 
 void rlibm_evaluate_and_update_weights(size_t* violated_indices, size_t num_violated_indices,
-				       interval_data* intervals, size_t nentries, size_t d){
+				       pinterval_data* intervals, size_t nentries, size_t d){
   double w_v = 0.0;
   double w_s = 0.0;
-
   // this can be optimized to only change the updated weights. For now
   // using an inefficient one
   for (size_t i = 0; i < nentries; i++){
@@ -308,7 +268,7 @@ void rlibm_evaluate_and_update_weights(size_t* violated_indices, size_t num_viol
 }
 
 void
-rlibm_regenerate_random_values_and_reset_weights(interval_data* intervals,
+rlibm_regenerate_random_values_and_reset_weights(pinterval_data* intervals,
 						 size_t nentries){
 
   std::random_device rd;
@@ -338,44 +298,149 @@ void rlibm_print_polyinfo(polynomial* p){
     exit(0);
   }
 
-  printf("Polynomial: y=%.70e x^(%d)",p->coeffs[0],p->power[0]);
+  printf("Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
   for(int j=1;j<p->termsize;j++){
-    printf(" + %.70e x^(%d)",p->coeffs[j],p->power[j]);
+    printf("\t     + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
   }
   printf("\n");
 
 }
 
-interval_data* rlibm_read_interval_file(char* filename, size_t* nentries){
-  
-  FILE* fp = fopen(filename, "r");
-  assert(fp != nullptr);
+size_t rlibm_count_entries(FILE *fp){
 
   /* count the number of entries */
-
+  
   fseek(fp, 0, SEEK_END);
   size_t nentries_total = ftell(fp);
   nentries_total = nentries_total/(3*sizeof(double));
   printf("number of intervals = %lu\n", nentries_total);
   fseek(fp, 0, SEEK_SET);
+  
+  return nentries_total;
+}
 
-  interval_data* intervals = (interval_data*) calloc(nentries_total, sizeof(interval_data));
+
+
+pinterval_data* rlibm_read_interval_file(char** argv, size_t* nentries){
+
+  /* argv[1] is bfloat16, argv[2] is tensforfloat32, argv[3] is float32  */
+  
+  FILE* float_file = fopen(argv[3], "r");
+  assert(float_file != nullptr);
+
+  FILE* bfloat_file = fopen(argv[1], "r");
+  assert(bfloat_file != nullptr);
+
+  FILE* tfloat_file = fopen(argv[2], "r");
+  assert(tfloat_file != nullptr);
+
+  size_t float_nentries = rlibm_count_entries(float_file);
+  size_t bfloat_nentries = rlibm_count_entries(bfloat_file);
+  size_t tfloat_nentries = rlibm_count_entries(tfloat_file);
+
+  size_t nentries_total = float_nentries + bfloat_nentries + tfloat_nentries;
+ 
+  pinterval_data* intervals = (pinterval_data*) calloc(nentries_total, sizeof(pinterval_data));
 
   std::random_device rd;
   std::mt19937 generator(rd());
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-  for (unsigned long i = 0; i < nentries_total; i++){
-    double data_entry[3];
-    size_t bytes = fread(data_entry, sizeof(double), 3, fp);
-    intervals[i].w = 1.0;
-    intervals[i].u = distribution(generator);
-    intervals[i].x = data_entry[0];
-    intervals[i].lb = data_entry[1];
-    intervals[i].ub = data_entry[2];
+  /* i is overall entries index */
+
+  /* j --> float, k --> tensorfloat, l--> bfloat */
+
+  double fdata_entry[3];
+  double tdata_entry[3];
+  double bdata_entry[3];
+  size_t i = 0;
+  size_t j= 0, k = 0, l = 0;
+  int b_read = 0, t_read = 0, f_read = 0;
+  while( i < nentries_total){
+
+    if(f_read == 0 && j < float_nentries){
+      size_t fbytes = fread(fdata_entry, sizeof(double), 3, float_file);
+      f_read = 1;
+      j++;
+    }
+    if(t_read == 0 && k < tfloat_nentries){
+      size_t tbytes = fread(tdata_entry, sizeof(double), 3,  tfloat_file);
+      t_read = 1;
+      k++;
+    }
+
+    if(b_read == 0 && l < bfloat_nentries){
+      size_t bbytes = fread(bdata_entry, sizeof(double), 3,  bfloat_file);
+      b_read = 1;
+      l++;
+    }
+    
+    double float_value = fdata_entry[0];
+    double bfloat_value = bdata_entry[0];
+    double tfloat_value = tdata_entry[0];
+    
+    if(f_read == 0){
+      assert(j == float_nentries);
+      float_value = 1.0/0.0;
+    }
+
+    
+    if(b_read == 0){
+      assert(l == bfloat_nentries);
+      bfloat_value = 1.0/0.0;
+    }
+
+    if(t_read == 0){
+      assert(k == tfloat_nentries);
+      tfloat_value = 1.0/0.0;
+    }
+
+
+    /* find the minimum  and add it based on them */
+
+    if((bfloat_value <= float_value) && (bfloat_value <= tfloat_value)){
+      intervals[i].w = 1.0;
+      intervals[i].u = distribution(generator);
+      intervals[i].x = bdata_entry[0];
+      intervals[i].lb = bdata_entry[1];
+      intervals[i].ub = bdata_entry[2];
+      intervals[i].rep = 0;
+      i++;
+      b_read = 0;
+    }
+
+    if((tfloat_value <= bfloat_value) && (tfloat_value <= float_value)){
+      intervals[i].w = 1.0;
+      intervals[i].u = distribution(generator);
+      intervals[i].x = tdata_entry[0];
+      intervals[i].lb = tdata_entry[1];
+      intervals[i].ub = tdata_entry[2];
+      intervals[i].rep = 1;
+      i++;
+      t_read = 0;      
+    }
+
+    if((float_value <= bfloat_value ) && (float_value <= tfloat_value)){
+      intervals[i].w = 1.0;
+      intervals[i].u = distribution(generator);
+      intervals[i].x = fdata_entry[0];
+      intervals[i].lb = fdata_entry[1];
+      intervals[i].ub = fdata_entry[2];
+      intervals[i].rep = 2;
+      i++;
+      f_read = 0;      
+    }
   }
 
-  fclose(fp);
+  assert(i == nentries_total);
+  assert(j == float_nentries);
+  assert(k == tfloat_nentries);
+  assert(l == bfloat_nentries);
+  
+  fclose(float_file);
+  fclose(bfloat_file);
+  fclose(tfloat_file);
+  
   *nentries = nentries_total;
   return intervals;
 }
@@ -383,18 +448,49 @@ interval_data* rlibm_read_interval_file(char* filename, size_t* nentries){
 
 int main(int argc, char** argv){
 
-  if(argc != 2){
-    printf("Usage: %s <interval file> \n", argv[0]);
+  if(argc < 5 || argc > 6){
+    printf("Usage: %s <bfloat16 interval file> <tf32 interval file> <float interval file> <powers_configuration file> <# of subdomains>\n", argv[0]);
     exit(0);
+  }
+
+  if (argc == 6) {
+    N_RLIBM_PIECES = atoi(argv[5]);
   }
 
   printf("EXIT_ON_THRESHOLD is %d\n", RLIBM_EXIT_ON_THRESHOLD);
 
   size_t nentries_total = 0;
-  interval_data* intervals_full = rlibm_read_interval_file(argv[1], &nentries_total);
+  pinterval_data* intervals_full = rlibm_read_interval_file(argv, &nentries_total);
+
+  /* powers array for each target represntation*/
   
-  int powers[]={1,2,3,4,5};
-  int powers_size = sizeof(powers)/sizeof(powers[0]);
+  int* powers[3];
+  int powers_size[3];
+
+  FILE* powers_file = fopen(argv[4], "r");
+  
+  int temp_power;
+  int pvalue;
+
+
+  for(int confs = 0; confs < 3; confs++){
+    fscanf(powers_file, "%d", &powers_size[confs]);
+    powers[confs] = (int*) calloc(powers_size[confs], sizeof(int));
+    for(int i = 0; i < powers_size[confs]; i++){
+      fscanf(powers_file, "%d", &powers[confs][i]);
+    }
+    fscanf(powers_file, "\n");
+  }
+  fclose(powers_file);
+
+  for(int confs = 0; confs < 3; confs++){
+    printf("Configuration %d\n", confs);
+    for(int i = 0; i< powers_size[confs]; i++){
+      printf(" %d ", powers[confs][i]);
+    }
+    printf("\n");	         
+  }
+
   
   //log2, log10
   //  int powers[]={0, 1,2,3,4,5,6, 7, 8, 9}; //coshx, exp2, exp10, exp
@@ -405,27 +501,47 @@ int main(int argc, char** argv){
   size_t nentries_pieces = nentries_total/N_RLIBM_PIECES;
   
   int prev_successful_degree = 0;
-  
+  size_t prev_end_index = 0;
   for(int i = 0; i < N_RLIBM_PIECES; i++){
 
     prev_successful_degree = 0;
-    size_t start_index = i * nentries_pieces;
-
+    size_t start_index = prev_end_index;
+    
     size_t even_split = (i+1) * nentries_pieces;
-    size_t end_index =  even_split > nentries_total? nentries_total: even_split;
 
+    /* Check the splits so that we don't split bfloat16, tfloat32, and float intervals for the same input */    
+
+    size_t new_end = even_split;
+    if(even_split < nentries_total){
+	if(even_split+1 < nentries_total){
+	  if(intervals_full[even_split+1].x == intervals_full[even_split].x)
+	    new_end++;
+	  
+	  if(even_split+2 < nentries_total){
+	    if(intervals_full[even_split+2].x == intervals_full[even_split].x)
+	      new_end++;
+	  }
+	}
+    }
+
+    size_t end_index =  new_end > nentries_total? nentries_total: new_end;
+
+    prev_end_index = end_index;
+    
     size_t nentries = end_index - start_index;
-    interval_data* intervals = &intervals_full[start_index];
+    pinterval_data* intervals = &intervals_full[start_index];
 
-    printf("piece = %d\n", i);
+    printf("Subdomain = %d\n", i);
     printf("start_index = %lu\n", start_index);
     printf("end_index = %lu\n", end_index);
     printf("nentries=%lu\n", nentries);
 
     /* sample size */
     
-    size_t cd = 9 * powers_size * powers_size;
+    size_t cd = 9 * powers_size[2] * powers_size[2];
     size_t samplesize = cd;
+
+    printf("sample size is %lu\n", samplesize);
     
     size_t n_violated_indices = 0;
     size_t *violated_indices = (size_t *) calloc(nentries, sizeof(size_t));
@@ -435,7 +551,7 @@ int main(int argc, char** argv){
     size_t prev_violated_indices = 0;
     size_t matched_violated_indices = 0;
     
-    sample_data* sampled_intervals = (sample_data *) calloc(cd, sizeof(sample_data));
+    psample_data* sampled_intervals = (psample_data *) calloc(cd, sizeof(psample_data));
     
     polynomial* p = nullptr;
     size_t total_iterations = 0;
@@ -459,6 +575,7 @@ int main(int argc, char** argv){
 	sampled_intervals[i].w = intervals[iindex].w;
 	sampled_intervals[i].u = intervals[iindex].u;
 	sampled_intervals[i].k = sampled_indices[i].key;
+	sampled_intervals[i].rep = intervals[iindex].rep;
       }
       
       /* need to implement these functions */
@@ -466,14 +583,15 @@ int main(int argc, char** argv){
       
       if(p){
 	n_violated_indices = rlibm_compute_violated_indices(violated_indices, intervals, nentries, p);
-	printf("number of violated intervals: %lu, total iterations=%lu \n", n_violated_indices, total_iterations);
+	printf("# violated intervals: %10lu, total iterations=%5lu", n_violated_indices, total_iterations);
+  fflush(stdout);
 	
 	if(n_violated_indices <= VIOLATE_THRESHOLD){
-	  printf("VIOLATING INPUTS BELOW THRESHOLD:\n");
-	  printf("starting input is %.70e\n", intervals[0].x);
+	  printf("\33[2K\rCANDIDATE POLYNOMIAL WITH %lu VIOLATED INPUTS:\n", n_violated_indices);
+	  printf("starting input: %.70e\n", intervals[0].x);
 	  
 	  for(size_t m = 0; m < n_violated_indices; m++){
-	    printf("violated_input is %.70e, lb is %.70e, ub is %.70e\n", intervals[violated_indices[m]].x, intervals[violated_indices[m]].lb, intervals[violated_indices[m]].ub);
+	    printf("violated input: %.70e\n\t    lb: %.70e\n\t    ub: %.70e\n", intervals[violated_indices[m]].x, intervals[violated_indices[m]].lb, intervals[violated_indices[m]].ub);
 	  }
 	  rlibm_print_polyinfo(p);
 	  if(RLIBM_EXIT_ON_THRESHOLD){
@@ -481,19 +599,19 @@ int main(int argc, char** argv){
 	  }
 	}
 	
-	rlibm_evaluate_and_update_weights(violated_indices, n_violated_indices, intervals, nentries, powers_size);
+	rlibm_evaluate_and_update_weights(violated_indices, n_violated_indices, intervals, nentries, powers_size[2]);
 	
       }
       else {
 	if(total_iterations > MAX_ITERATIONS){
-	  printf("total iterations exceeded %d, terminating the polynomial geenerator\n", MAX_ITERATIONS);
+	  printf("\ftotal iterations exceeded %d, terminating the polynomial geenerator\n", MAX_ITERATIONS);
 	  if(p!= nullptr){
 	    free(p);
 	    p = nullptr;	  
 	  }
 	  break;
 	}
-	printf("failed to generate polynomial, resetting weights, total_iterations=%lu\n", total_iterations);
+	printf("\rfailed to generate polynomial, resetting weights, total_iterations=%lu\n", total_iterations);
 	prev_successful_degree = 0;      
 	rlibm_regenerate_random_values_and_reset_weights(intervals, nentries);
       }
@@ -505,7 +623,7 @@ int main(int argc, char** argv){
 	  matched_violated_indices = 0;
 	  n_violated_indices = 0;
 	  
-	  printf("not making progress, same number of violated indices, resetting weights, total_iterations=%lu\n", total_iterations);
+	  printf("\rnot making progress, same number of violated indices, resetting weights, total_iterations=%lu\n", total_iterations);
 	  prev_successful_degree = 0;
 	  rlibm_regenerate_random_values_and_reset_weights(intervals, nentries);
 	  if(p!= nullptr) {
@@ -522,17 +640,20 @@ int main(int argc, char** argv){
     } while(n_violated_indices > 0 || !p);
     
     if(p){
+      printf("\nFINAL POLYNOMIAL THAT SATISFIES ALL INTERVALS:\n");
       rlibm_print_polyinfo(p);
     }
     else {
-      printf("Could not generate the polynomial that satisifies all intervals, check for partial results with a few violated intervals\n");
+      printf("\nCould not generate the polynomial that satisifies all intervals, check for partial results with a few violated intervals\n");
     }
     free(p);
     free(sampled_intervals);
     free(sampled_indices);
-    free(violated_indices);    
+    free(violated_indices);
+    
   } // ends the outer piecewise loop
 
   free(intervals_full);
   return 0;
+
 }

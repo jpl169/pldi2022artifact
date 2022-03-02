@@ -1,6 +1,4 @@
 #!/bin/bash
-mkdir -p ${FLOAT34INTERVALPATH}
-
 
 ./polygen ${BF16INTERVALPATH}/bf16LogIntervals ${TF32INTERVALPATH}/tf32LogIntervals ${FLOAT34INTERVALPATH}/Float34ROLogIntervals configs/log.config 4
 ./polygen ${BF16INTERVALPATH}/bf16Log2Intervals ${TF32INTERVALPATH}/tf32Log2Intervals ${FLOAT34INTERVALPATH}/Float34ROLog2Intervals configs/log2.config 1

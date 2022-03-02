@@ -1,6 +1,6 @@
 CC = gcc
 
-funcNames = Log2Small
+funcNames = Log2
 
 src = $(patsubst %, %.c, $(funcNames))
 obj = $(patsubst %, %, $(funcNames))

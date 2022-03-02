@@ -1,1 +1,0 @@
- ./progressive-polygen /filer/tmp1/jpl169/bfloat16_intervals/bfloat16_log10_intervals /filer/tmp1/jpl169/tf32_intervals/tf32_log10_intervals /filer/tmp1/sn349/float-rno/Float34ROIntervalData/Float34RoLog10IntervalData log-progressive.config > log10-progressive.txt &

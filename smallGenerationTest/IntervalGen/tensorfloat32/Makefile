@@ -1,4 +1,4 @@
-objects = Log2Small
+objects = Log2
 
 CC=g++
 

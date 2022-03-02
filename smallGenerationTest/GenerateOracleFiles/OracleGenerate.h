@@ -6,27 +6,22 @@ mpfr_t mval;
 
 double ComputeOracleResult(float x);
 
-void RunTestHelper(char* FileName, unsigned long start, unsigned long end) {
-  unsigned long count = 0;
-  
-  float x;
-  floatX xbase;
-  
-  FILE* f = fopen(FileName, "w");
-  
-  for (count = start; count < end; count++) {
-    xbase.x = count;
-    x = xbase.f;
-    
-    double res = ComputeOracleResult(x);
-    
-    fwrite(&res, sizeof(double), 1, f);
-  }
-  
-  fclose(f);
-
-}
-
 void RunTest(char* FileName) {
-  RunTestHelper(FileName, 0x0, 0x100000000);
+    unsigned long count = 0;
+  
+    float x;
+    floatX xbase;
+
+    FILE* f = fopen(FileName, "w");
+  
+    for (count = 0x0; count < 0x100000000; count++) {
+        xbase.x = count;
+        x = xbase.f;
+    
+        double res = ComputeOracleResult(x);
+
+        fwrite(&res, sizeof(double), 1, f);
+    }
+
+    fclose(f);
 }
