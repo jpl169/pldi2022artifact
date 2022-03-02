@@ -1,3 +1,7 @@
+echo -e "\033[1m* Overhead testing for small set of random inputs: "
+echo -e "\033[1m  Estimated time: 10 minutes \033[0m"
+echo -e ""
+
 #!/bin/bash
 cd glibc_proglibm/bf16
 make -s clean
