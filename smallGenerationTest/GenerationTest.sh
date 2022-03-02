@@ -7,6 +7,7 @@ echo -e "\033[1mGenerating Log2(x) progressive polynomials for inputs x in [1, 2
 echo -e "\033[1mEstimated time: 7 minutes \033[0m"
 echo -e "\033[1mGenerating float34 oracle file \033[0m"
 
+'''
 mkdir -p ${SMALLORACLEPATH}
 cd GenerateOracleFiles
 make -s clean
@@ -33,6 +34,7 @@ make -s clean
 make -s
 ./Log2 ${SMALLINTERVALS}/FP34Log2Interval ${SMALLORACLEPATH}/Log2Oracle
 cd ../..
+'''
 
 echo -e "\033[1mGenerating progressive polynomial \033[0m"
 cd polynomial_gen
