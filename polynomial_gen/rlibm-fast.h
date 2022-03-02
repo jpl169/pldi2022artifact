@@ -3,18 +3,18 @@
 
 #define SOPLEX_WITH_GMP
 #include <math.h>
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <soplex.h>
-#include<fstream>
-#include<memory>
-#include<random>
+#include <fstream>
+#include <memory>
+#include <random>
 
 #define MAX_TRIES 100
 #define VIOLATE_THRESHOLD 10
 #define SAMPLE_MATCH_THRESHOLD 20
 #define MAX_ITERATIONS 600
-#define N_RLIBM_PIECES 1
+int N_RLIBM_PIECES = 1
 
 
 #ifdef EXIT_ON_THRESHOLD

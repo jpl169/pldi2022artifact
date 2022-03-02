@@ -448,9 +448,13 @@ pinterval_data* rlibm_read_interval_file(char** argv, size_t* nentries){
 
 int main(int argc, char** argv){
 
-  if(argc != 5){
-    printf("Usage: %s <bfloat16 interval file> <tf32 interval file> <float interval file> <powers_configuration file>\n", argv[0]);
+  if(argc < 5 || argc > 6){
+    printf("Usage: %s <bfloat16 interval file> <tf32 interval file> <float interval file> <powers_configuration file> <# of subdomains>\n", argv[0]);
     exit(0);
+  }
+
+  if (argc == 6) {
+    N_RLIBM_PIECES = atoi(argv[5]);
   }
 
   printf("EXIT_ON_THRESHOLD is %d\n", RLIBM_EXIT_ON_THRESHOLD);
@@ -527,7 +531,7 @@ int main(int argc, char** argv){
     size_t nentries = end_index - start_index;
     pinterval_data* intervals = &intervals_full[start_index];
 
-    printf("piece = %d\n", i);
+    printf("Subdomain = %d\n", i);
     printf("start_index = %lu\n", start_index);
     printf("end_index = %lu\n", end_index);
     printf("nentries=%lu\n", nentries);
