@@ -1,5 +1,5 @@
 #!/bin/bash
-cd correctness_test/source
+cd correctness_test_full/source
 ./CleanTest.sh
 ./BuildTest.sh
 ./RunTest.sh
