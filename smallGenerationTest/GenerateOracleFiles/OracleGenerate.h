@@ -4,7 +4,7 @@
 
 mpfr_t mval;
 
-double ComputeOracleResult(float x);
+double ComputeOracleResult(float x, unsigned long start, unsigned long end);
 
 void RunTest(char* FileName) {
     unsigned long count = 0;
@@ -14,7 +14,7 @@ void RunTest(char* FileName) {
 
     FILE* f = fopen(FileName, "w");
   
-    for (count = 0x0; count < 0x100000000; count++) {
+    for (count = start; count < end; count++) {
         xbase.x = count;
         x = xbase.f;
     
