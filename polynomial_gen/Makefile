@@ -1,5 +1,5 @@
-SOPLEX_INCLUDE=/filer/tmp1/sn349/soplex-4.0.1/src/
-SOPLEX_LIB=/filer/tmp1/sn349/soplex-4.0.1/build/lib/libsoplex.a
+SOPLEX_INCLUDE=$(SOPLEXPATH)/src/
+SOPLEX_LIB=$(SOPLEXPATH)/build/lib/libsoplex.a
 
 all: progressive
 
