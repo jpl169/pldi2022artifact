@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SMALLORACLEPATH=${PWD}/oracle
+SMALLINTERVALS=${PWD}/intervals
+
 echo -e "\033[1mGenerating Log2(x) progressive polynomials for inputs x in [1, 2) \033[0m"
 echo -e "\033[1mEstimated time: 7 minutes \033[0m"
 echo -e "\033[1mGenerating float34 oracle file \033[0m"
