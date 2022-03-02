@@ -39,6 +39,6 @@ ENV SMALLINTERVALS=/home/pldi2022artifact/smallGenerationTest/intervals
 ####################################################################
 RUN git clone https://github.com/jpl169/pldi2022artifact.git && \
     cd pldi2022artifact && \
-    make
+    ./BuildLibraries.sh
 
 WORKDIR /home/pldi2022artifact
