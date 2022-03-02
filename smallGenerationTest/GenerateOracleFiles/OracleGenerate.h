@@ -4,9 +4,9 @@
 
 mpfr_t mval;
 
-double ComputeOracleResult(float x, unsigned long start, unsigned long end);
+double ComputeOracleResult(float x);
 
-void RunTest(char* FileName) {
+void RunTest(char* FileName, unsigned long start, unsigned long end) {
     unsigned long count = 0;
   
     float x;
