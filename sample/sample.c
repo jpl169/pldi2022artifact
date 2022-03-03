@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "float_prog_lib.h"
+#include "progressive/float_prog_lib.h"
 
 int main(int argc, char** argv) {
   // Compute e^0.005 / sinpi(0.75), but in float for each computation
