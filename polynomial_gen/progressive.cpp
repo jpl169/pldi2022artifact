@@ -291,16 +291,28 @@ bool check_sampled_indices(sample_info* sample, sample_info* prev_sample, size_t
   return true;
 }
 
-void rlibm_print_polyinfo(polynomial* p){
+void rlibm_print_polyinfo(polynomial* p, int** powers, int* powers_sizes){
 
   if(p->termsize == 0){
     printf("Polynomial has no terms!\n");
     exit(0);
   }
 
-  printf("Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
+  printf("BF16 Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
+  for(int j=1;j<p->powers_sizes[0];j++){
+    printf("                  + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
+  }
+  printf("\n");
+
+  printf("TF32 Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
+  for(int j=1;j<p->powers_sizes[1];j++){
+    printf("                  + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
+  }
+  printf("\n");
+
+  printf("Full Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
   for(int j=1;j<p->termsize;j++){
-    printf("\t     + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
+    printf("                  + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
   }
   printf("\n");
 
@@ -565,17 +577,17 @@ int main(int argc, char** argv){
       total_iterations++;
       
       for (size_t i = 0; i < cd; i++){
-	size_t iindex = sampled_indices[i].index;
-	
-	sampled_intervals[i].x = intervals[iindex].x;
-	sampled_intervals[i].lb = intervals[iindex].lb;
-	sampled_intervals[i].ub = intervals[iindex].ub;
-	sampled_intervals[i].orig_lb = sampled_intervals[i].lb;
-	sampled_intervals[i].orig_ub = sampled_intervals[i].ub;
-	sampled_intervals[i].w = intervals[iindex].w;
-	sampled_intervals[i].u = intervals[iindex].u;
-	sampled_intervals[i].k = sampled_indices[i].key;
-	sampled_intervals[i].rep = intervals[iindex].rep;
+        size_t iindex = sampled_indices[i].index;
+        
+        sampled_intervals[i].x = intervals[iindex].x;
+        sampled_intervals[i].lb = intervals[iindex].lb;
+        sampled_intervals[i].ub = intervals[iindex].ub;
+        sampled_intervals[i].orig_lb = sampled_intervals[i].lb;
+        sampled_intervals[i].orig_ub = sampled_intervals[i].ub;
+        sampled_intervals[i].w = intervals[iindex].w;
+        sampled_intervals[i].u = intervals[iindex].u;
+        sampled_intervals[i].k = sampled_indices[i].key;
+        sampled_intervals[i].rep = intervals[iindex].rep;
       }
       
       /* need to implement these functions */
@@ -593,7 +605,7 @@ int main(int argc, char** argv){
 	  for(size_t m = 0; m < n_violated_indices; m++){
 	    printf("violated input: %.70e\n\t    lb: %.70e\n\t    ub: %.70e\n", intervals[violated_indices[m]].x, intervals[violated_indices[m]].lb, intervals[violated_indices[m]].ub);
 	  }
-	  rlibm_print_polyinfo(p);
+	  rlibm_print_polyinfo(p, powers, powers_size);
 	  if(RLIBM_EXIT_ON_THRESHOLD){
 	    break;
 	  }
@@ -618,30 +630,30 @@ int main(int argc, char** argv){
       
       /* debugging feature to reset weights for the sample if not making progress*/
       if(n_violated_indices != 0 && (prev_violated_indices == n_violated_indices)){
-	matched_violated_indices++;
-	if(matched_violated_indices > SAMPLE_MATCH_THRESHOLD){
-	  matched_violated_indices = 0;
-	  n_violated_indices = 0;
-	  
-	  printf("\rnot making progress, same number of violated indices, resetting weights, total_iterations=%lu\n", total_iterations);
-	  prev_successful_degree = 0;
-	  rlibm_regenerate_random_values_and_reset_weights(intervals, nentries);
-	  if(p!= nullptr) {
-	    free(p);
-	    p = nullptr;
-	  }
-	  continue;
-	}
+        matched_violated_indices++;
+        if(matched_violated_indices > SAMPLE_MATCH_THRESHOLD){
+          matched_violated_indices = 0;
+          n_violated_indices = 0;
+          
+          printf("\rnot making progress, same number of violated indices, resetting weights, total_iterations=%lu\n", total_iterations);
+          prev_successful_degree = 0;
+          rlibm_regenerate_random_values_and_reset_weights(intervals, nentries);
+          if(p!= nullptr) {
+            free(p);
+            p = nullptr;
+          }
+          continue;
+        }
       }
       else{
-	matched_violated_indices = 0;
-	prev_violated_indices = n_violated_indices;
+        matched_violated_indices = 0;
+        prev_violated_indices = n_violated_indices;
       }    
     } while(n_violated_indices > 0 || !p);
     
     if(p){
       printf("\nFINAL POLYNOMIAL THAT SATISFIES ALL INTERVALS:\n");
-      rlibm_print_polyinfo(p);
+      rlibm_print_polyinfo(p, powers, powers_size);
     }
     else {
       printf("\nCould not generate the polynomial that satisifies all intervals, check for partial results with a few violated intervals\n");
