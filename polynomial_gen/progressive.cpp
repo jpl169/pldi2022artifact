@@ -34,9 +34,9 @@ polynomial* rlibm_solve_with_soplex(psample_data* sintervals,
     for(int j=0; j<termsize;j++){
       Rational toAdd(1.0);
       if(j < power_size[sintervals[i].rep])
-	for(int k=0;k<power[sintervals[i].rep][j];k++) toAdd*=xValR;
+	      for(int k=0;k<power[sintervals[i].rep][j];k++) toAdd*=xValR;
       else
-	toAdd *= 0.0;
+	      toAdd *= 0.0;
       
       row1.add(j,toAdd);
     }
@@ -300,12 +300,16 @@ void rlibm_print_polyinfo(polynomial* p, int** powers, int* powers_sizes){
 
   printf("\n");
   printf("BF16 Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
-  for(int j=1;j<powers_sizes[0];j++){
+  int bfloat16_term = powers_sizes[0];
+  if (p->termsize < bfloat16_term) bfloat16_term = p->termsize;
+  for(int j=1;j<bfloat16_term;j++){
     printf("                  + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
   }
 
   printf("TF32 Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
-  for(int j=1;j<powers_sizes[1];j++){
+  int tf32_terms = powers_sizes[1];
+  if (p->termsize < tf32_terms) tf32_terms = p->termsize;
+  for(int j=1;j<tf32_terms;j++){
     printf("                  + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
   }
 
