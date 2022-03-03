@@ -2,6 +2,8 @@
 #include "luts.h"
 #include "math.h"
 
+// ComputeOracleResult:
+// Given a tf32 input, compute the correctly rouned tf32 result
 float IntervalGenerator::MpfrCalculateFunction(float x) {
   int exact = mpfr_set_d(mval, x, MPFR_RNDN);
   if (exact != 0) {
@@ -27,6 +29,14 @@ float IntervalGenerator::MpfrCalculateFunction(float x) {
   return result;
 }
 
+// TODO : For the given input, describe whether it is a special case input
+// or not. If it is a special case input, give the result in "res" and return
+// true. Otherwise, return false.
+// MAKE SURE : To identify all inputs that result in NaN or infinities.
+// Otherwise, interval generation will go into infinite loop
+// MAKE SURE : To identify all inputs with a singleton odd interval and
+// classify it as special cases. Otherwise, we will not be able to generate
+// a polynomial using the resulting file.
 bool IntervalGenerator::ComputeSpecialCase(float x, float& res) {
     floatX fx;
     fx.f = x;
@@ -45,6 +55,9 @@ bool IntervalGenerator::ComputeSpecialCase(float x, float& res) {
     return false;
 }
 
+// TODO : This is where we write the range reduction function, x' = RR(x).
+// Given an original input "x" compute the reduced input "x'" and return x'.
+// If not using range reduction function, simply return x.
 double IntervalGenerator::RangeReduction(float x) {
     floatX fix, fit;
     
@@ -67,7 +80,12 @@ double IntervalGenerator::RangeReduction(float x) {
     double f = fix.f - F;
     return f * log2OneByF[FIndex];
 }
-    
+
+// TODO : This is where we write the output compensation function, y = OC(y').
+// Given the output of the polynomial "y'" (passed via the argument yp),
+// compute the final output "y." You may need the original input (x) to
+// compute additional information to produce "y."
+// If not using range reduction, simply return yp.
 double IntervalGenerator::OutputCompensation(float x, double yp) {
     floatX fix, fit;
     
@@ -88,12 +106,35 @@ double IntervalGenerator::OutputCompensation(float x, double yp) {
     return yp + log2Lut[FIndex] + m;
 }
 
+// TODO : To compute the reduced interval from the odd interval, please give an
+// initial singleton reduced interval point. This singleton value, if used
+// with the output compensation function, MUST PRODUCE a value within the
+// rounding interval.
+// NOTE : The vast majority of the code in this function tries to make sure
+// that the given singleton point does indeed generate a value within the
+// rounding interval, as long as the initial guessing point is within a few
+// ulps away from such a point.
+// Arguments:
+// x : The original input x
+// [roundingLb, roundingUb] : The odd interval
+// xp : the reduced input
+// [lb, ub] : (Return values) The initial singleton reduced interval
 void IntervalGenerator::GuessInitialLbUb(double xp, double& lb, double& ub) {
     lb = log1p(xp) / log(2);
     ub = log1p(xp) / log(2);
     return;
 }
 
+// If computing the reduced interval is TRULY TRULY special, we can use this
+// function to signify that the reduced interval is special.
+// Arguments:
+// x : the original input x
+// glb : The lower bound of odd interval
+// blb : Whether the lower bound of the reduced interval is special
+// slb : The lower bound of the reduced interval
+// gub : The upper bound of odd interval
+// blb : Whether the upper bound of the reduced interval is special
+// slb : The upper bound of the reduced interval.
 void IntervalGenerator::SpecCaseRedInt(float x,
                                        double glb, bool& blb, double& slb,
                                        double gub, bool& bub, double& sub) {
@@ -118,6 +159,8 @@ int main(int argc, char** argv) {
   }
   
   IntervalGenerator Log2IntGen;
+    // TODO : Make sure the input range here matches with the input ranges given
+    // in the oracle generation step.
   Log2IntGen.CreateReducedIntervalFile(0x3f80, 0x4000, argv[1]);
   
   mpfr_clear(mval);
