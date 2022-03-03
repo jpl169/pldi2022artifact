@@ -37,7 +37,8 @@ ENV SMALLINTERVALS=/home/pldi2022artifact/smallGenerationTest/intervals
 ####################################################################
 # git clone pldi2022artifact
 ####################################################################
-RUN git clone https://github.com/jpl169/pldi2022artifact.git && \
+RUN wget https://registrationcenter-download.intel.com/akdlm/irc_nas/18211/l_HPCKit_p_2021.4.0.3347.sh && \
+    git clone https://github.com/jpl169/pldi2022artifact.git && \
     cd pldi2022artifact && \
     ./BuildLibraries.sh
 
