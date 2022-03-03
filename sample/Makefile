@@ -1,4 +1,4 @@
-CC = gcc-10
+CC = gcc
 
 funcNames = sample
 
@@ -8,7 +8,7 @@ obj = $(patsubst %, %, $(funcNames))
 all: $(obj)
 
 %: %.c
-	$(CC) -I../include -std=c11 $^ ../lib/float34ROMathLib.a -lm -o $@
+	$(CC) -I../include/progressive -std=c11 $^ ../libm/floatproglibm.a -lm -o $@
 
 clean:
 	rm -rf $(obj) *.dSYM

@@ -1,5 +1,5 @@
 echo -e "\033[1m* Overhead testing for all inputs and all functions:  \033[0m"
-echo -e "\033[1m  Estimated time: 10 hours \033[0m"
+echo -e "\033[1m  Estimated time: 4.5 hours \033[0m"
 echo -e ""
 
 #!/bin/bash
