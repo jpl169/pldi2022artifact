@@ -298,23 +298,21 @@ void rlibm_print_polyinfo(polynomial* p, int** powers, int* powers_sizes){
     exit(0);
   }
 
+  printf("\n");
   printf("BF16 Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
   for(int j=1;j<powers_sizes[0];j++){
     printf("                  + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
   }
-  printf("\n");
 
   printf("TF32 Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
   for(int j=1;j<powers_sizes[1];j++){
     printf("                  + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
   }
-  printf("\n");
 
   printf("Full Polynomial: y=%.70e x^(%d)\n",p->coeffs[0],p->power[0]);
   for(int j=1;j<p->termsize;j++){
     printf("                  + %.70e x^(%d)\n",p->coeffs[j],p->power[j]);
   }
-  printf("\n");
 
 }
 
